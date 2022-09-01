@@ -1,0 +1,363 @@
+import {GRID_SIZE, CELL_SIZE, Grid} from "./Grid.js";
+import Piece from "./Piece.js";
+
+const gameBoard = document.getElementById("game-board");
+const grid = new Grid(gameBoard);
+
+
+//initialization of game board (2 starting pieces)
+var pieceList = [];
+for (let i = 0; i < 2; i++){
+    spawnNewPiece(); 
+}
+// console.log(pieceList);
+// console.log(grid);
+// console.log(grid.cells);
+// console.log(grid.cellsWithPieces());
+// console.log(Math.sqrt(grid.cells.length));
+// console.log(CELL_SIZE);
+
+//testing bishop movement
+let curEmptyCell = grid.randomEmptyCell();
+let curSpawnPiece = 'bishop';
+curEmptyCell.piece = new Piece(gameBoard, curSpawnPiece);
+pieceList.push(curEmptyCell.piece);
+
+//testing rook movement
+curEmptyCell = grid.randomEmptyCell();
+curSpawnPiece = 'rook';
+curEmptyCell.piece = new Piece(gameBoard, curSpawnPiece);
+pieceList.push(curEmptyCell.piece);
+
+//testing queen movement
+curEmptyCell = grid.randomEmptyCell();
+curSpawnPiece = 'queen';
+curEmptyCell.piece = new Piece(gameBoard, curSpawnPiece);
+pieceList.push(curEmptyCell.piece);
+//start of game 
+handleInput();
+
+// handle user input
+function handleInput() {
+    let startDragX;
+    let startDragY; 
+    let curMagnitude = 0;
+    let dragVec = [0,0];
+    var isMouseDown = false;
+    //when mouse pressed, record starting position
+    window.onmousedown = function(e) { e.preventDefault();
+        isMouseDown = true;
+
+        startDragX = e.pageX;
+        startDragY = e.pageY;
+        //console.log(`start: ${startDragX}, ${startDragY}`);
+    };
+    //when mouse let go, reset offsets of pieces and make move if drag was large enough
+
+    window.onmouseup   = function(e) { e.preventDefault();
+        isMouseDown = false;
+        for (let curPiece of pieceList) {
+            curPiece.offsetx = 0;
+            curPiece.offsety = 0;
+        }
+        //console.log(pieceList)
+        if (curMagnitude > window.innerWidth/4) {
+            console.log('making move'); 
+            //adjust grid elements and move pieces
+            
+            for (let curPiece of pieceList) {
+                let startPosition = [curPiece.x, curPiece.y];
+                //console.log(curPiece)
+                movePiece(startPosition, dragVec, curPiece);
+
+            }
+            if (!grid.allCellsFilled()) {
+                console.log("spawning new piece");
+                console.log(grid);
+                spawnNewPiece();
+            }
+            
+        }
+        curMagnitude = 0
+        
+    };
+    window.onmousemove = function(e) { if(isMouseDown) { 
+        dragVec = [e.pageX - startDragX, e.pageY - startDragY];
+        //console.log(`current vector: ${dragVec}`);
+        curMagnitude = magnitude(dragVec[0], dragVec[1]);
+        //nudge pieces in direction of drag
+        for (let curPiece of pieceList){
+            //console.log(curPiece);
+            curPiece.offsetx = nudgeDistance(dragVec[0]);
+            curPiece.offsety = nudgeDistance(dragVec[1]);
+        }
+     } 
+    };
+}
+
+function movePiece(startPos, dragVec, curPiece) {
+    // console.log(startPos);
+    // console.log(dragVec);
+    // console.log(pieceType);
+    let pieceType = curPiece.piece;
+    let dx = dragVec[0];
+    let dy = dragVec[1]; // upward movement is negative dy
+    let endPos;
+
+    switch (pieceType) {
+        case 'pawn':
+            //pawn movement
+            endPos = movePawn(dx, dy, startPos);
+            break
+        case 'knight':
+            //knight movement
+            endPos = moveKnight(dx, dy, startPos);
+            break
+        case 'bishop':
+            //bishop movement
+            endPos = moveBishop(dx, dy, startPos);
+            break
+        case 'rook':
+            //rook movement
+            endPos = moveRook(dx, dy, startPos);
+            break
+        case 'queen':
+            //queen movement
+            endPos = moveQueen(dx, dy, startPos);
+            break
+    }
+    let gridInd = startPos[0] + GRID_SIZE*startPos[1];
+    grid.cells[gridInd].piece = undefined;
+
+    curPiece.x = endPos[0];
+    curPiece.y = endPos[1];
+    gridInd = endPos[0] + GRID_SIZE*endPos[1];
+    grid.cells[gridInd].piece = curPiece
+}
+
+function movePawn(dx, dy, startPos) {
+    let curTan = dy/dx;
+    let moveX = 0;
+    let moveY = 0;
+    if ((dy > 0 && dx === 0) || (curTan > 1 && dx > 0) || (curTan < -1 && dx < 0)) {
+        moveY += 1
+    }
+    else if ((dy < 0 && dx === 0) || (curTan > 1 && dx < 0 ) || (curTan < -1 && dx > 0)) {
+        moveY -= 1
+    }
+    else if ((curTan >= -1 && curTan <= 1 && dx < 0)) {
+        moveX -= 1
+    }
+    else { 
+        moveX += 1
+    }
+    let curPos = [startPos[0] + moveX, startPos[1] + moveY];
+    if (inBounds(curPos)){
+        //console.log("pawn is now at ", curPos);
+        return curPos;
+    }
+    //console.log("pawn stays at ", startPos);
+    return startPos
+
+}
+
+function moveKnight(dx, dy, startPos) {
+    let curTan = dy/dx;
+    let moveX = 0;
+    let moveY = 0;
+    if (curTan >= 1 && dx >= 0) {
+        //console.log("down 2 right 1");
+        moveX += 1;
+        moveY += 2;
+    }
+    else if (curTan >= 1 && dx < 0) {
+        //console.log("up 2 left 1");
+        moveX -= 1;
+        moveY -= 2;
+    }
+    else if ((dx === 0 && dy > 0) || (curTan <= -1 && dx >= 0)) {
+        //console.log("up 2 right 1");
+        moveX += 1;
+        moveY -= 2;
+    }
+    else if ((dx === 0 && dy < 0) || (curTan <= -1 && dx < 0)) {
+        //console.log("down 2 left 1");
+        moveX -= 1;
+        moveY += 2;
+    }
+    else if (curTan > -1 && curTan <= 0 && dx > 0) {
+        //console.log("right 2 up 1");
+        moveX += 2;
+        moveY -= 1;
+    }
+    else if (curTan > -1 && curTan <= 0 && dx < 0) {
+        //console.log("left 2 down 1");
+        moveX -= 2;
+        moveY += 1;
+    }
+    else if (curTan > 0 && curTan < 1 && dx > 0) {
+        //console.log("right 2 down 1");
+        moveX += 2;
+        moveY += 1;
+    }
+    else if (curTan > 0 && curTan < 1 && dx < 0) {
+        //console.log("left 2 up 1");
+        moveX -= 2;
+        moveY -= 1;
+    }
+    let curPos = [startPos[0] + moveX, startPos[1] + moveY];
+    
+    if (inBounds(curPos)){
+        //console.log("knight is now at ", curPos);
+        return curPos;
+    }
+    //console.log("knight stays at ", startPos);
+    return startPos
+}
+
+function moveBishop(dx, dy, startPos) {
+    let curTan = dy/dx;
+    let moveX = 0;
+    let moveY = 0;
+    if ((dx === 0 && dy > 0) || (curTan > 0 && dx > 0)) {
+        //console.log("bishop down right");
+        moveX += 1;
+        moveY += 1;
+    }    
+    else if ((dx === 0 && dy < 0) || (curTan > 0 && dx < 0)) {
+        //console.log("bishop up left");
+        moveX -= 1;
+        moveY -= 1;
+    }
+    else if (curTan <= 0 && dx > 0) {
+        //console.log("bishop up right");
+        moveX += 1;
+        moveY -= 1;
+    }
+    else if (curTan <= 0 && dx < 0) {
+        //console.log("bishop down left");
+        moveX -= 1;
+        moveY += 1;
+    }
+    let curPos = [startPos[0], startPos[1]];
+    while (inBounds(curPos)){
+        curPos[0] += moveX;
+        curPos[1] += moveY;
+    }
+    curPos[0] -= moveX;
+    curPos[1] -= moveY;
+    //console.log("bishop is now at ", curPos);
+    return curPos;
+
+}
+
+function moveRook(dx, dy, startPos) {
+    let curTan = dy/dx;
+    let moveX = 0;
+    let moveY = 0;
+    if ((dx === 0 && dy < 0) || (curTan < -1 && dx > 0) || (curTan > 1 && dx < 0)) {
+        //console.log("rook up");
+        moveY -= 1;
+    }    
+    else if ((dx === 0 && dy > 0) || (curTan < -1 && dx < 0) || (curTan > 1 && dx > 0)) {
+        //console.log("rook down");
+        moveY += 1;
+    }
+    else if (curTan <= 1 && curTan >= -1 && dx > 0) {
+        //console.log("rook right");
+        moveX += 1
+    }
+    else if (curTan <= 1 && curTan >= -1 && dx < 0) {
+        //console.log("rook left");
+        moveX -= 1
+    }
+
+    let curPos = [startPos[0], startPos[1]];
+    while (inBounds(curPos)){
+        curPos[0] += moveX;
+        curPos[1] += moveY;
+    }
+    curPos[0] -= moveX;
+    curPos[1] -= moveY;
+    //console.log("rook is now at ", curPos);
+    return curPos;
+}
+
+function moveQueen(dx, dy, startPos) {
+    let curTan = dy/dx;
+    let moveX = 0;
+    let moveY = 0;
+    if ((dx === 0 && dy < 0) || (curTan < (-1 - Math.sqrt(2)) && dx > 0) || (curTan > (1+Math.sqrt(2)) && dx < 0)) {
+        //console.log("queen up");
+        moveY -= 1;
+    }
+    else if ((dx === 0 && dy > 0) || (curTan < (-1 - Math.sqrt(2)) && dx < 0) || (curTan > (1+Math.sqrt(2)) && dx > 0)) {
+        //console.log("queen down");
+        moveY += 1;
+    }
+    else if ((curTan < (-1 + Math.sqrt(2)) && curTan > (1 - Math.sqrt(2)) && dx > 0)) {
+        //console.log("queen right");
+        moveX += 1
+    }
+    else if ((curTan < (-1 + Math.sqrt(2)) && curTan > (1 - Math.sqrt(2)) && dx < 0)) {
+        //console.log("queen left");
+        moveX -= 1
+    }
+    else if ((curTan >= (-1 + Math.sqrt(2)) && curTan <= (1 + Math.sqrt(2)) && dx > 0)) {
+        //console.log("queen down right");
+        moveX += 1;
+        moveY += 1;
+    }
+    else if ((curTan >= (-1 + Math.sqrt(2)) && curTan <= (1 + Math.sqrt(2)) && dx < 0)) {
+        //console.log("queen up left");
+        moveX -= 1;
+        moveY -= 1;
+    }
+    else if ((curTan >= (-1 - Math.sqrt(2)) && curTan <= (1 - Math.sqrt(2)) && dx > 0)) {
+        //console.log("queen up right");
+        moveX += 1;
+        moveY -= 1;
+    }
+    else if ((curTan >= (-1 - Math.sqrt(2)) && curTan <= (1 - Math.sqrt(2)) && dx < 0)) {
+        //console.log("queen down left");
+        moveX -= 1;
+        moveY += 1;
+    }
+    let curPos = [startPos[0], startPos[1]];
+    
+    while (inBounds(curPos)){
+        
+        curPos[0] += moveX;
+        curPos[1] += moveY;
+    }
+    curPos[0] -= moveX;
+    curPos[1] -= moveY;
+    //console.log("queen is now at ", curPos);
+    return curPos;
+}
+
+function inBounds(endLoc) {
+    let endx = endLoc[0];
+    let endy = endLoc[1];
+    return endx >= 0 && endx < GRID_SIZE && endy >= 0 && endy < GRID_SIZE;
+}
+
+function nudgeDistance(dragDistance) {
+    if (dragDistance >= 0){
+        return Math.sqrt(dragDistance)/100;
+
+    }
+    return -Math.sqrt(-dragDistance)/100;
+}
+
+function magnitude(x,y){
+    return Math.sqrt(Math.pow(x,2)+Math.pow(y,2));
+}
+
+function spawnNewPiece(){
+    let curEmptyCell = grid.randomEmptyCell();
+    let curSpawnPiece = Math.random() > 0.1 ? 'pawn' : 'knight';
+    console.log(curEmptyCell.x, curEmptyCell.y);
+    curEmptyCell.piece = new Piece(gameBoard, curSpawnPiece);
+    pieceList.push(curEmptyCell.piece);
+}

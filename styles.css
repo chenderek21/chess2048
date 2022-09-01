@@ -1,0 +1,105 @@
+@font-face{
+    src: url(fonts/ClearSans-Regular.ttf);
+    font-family: Clear Sans;
+}
+
+*, *::before, *::after {
+    box-sizing: border-box;
+    /* font-family: Clear Sans; */
+    font-family: 'Century Gothic', 'serif'
+}
+h1 {
+    font-size: 8vmin;
+    margin: 0.2em 0.1em 0.5em;
+}
+.knight2 {
+    height: 7vmin
+    
+}
+
+h1, knight2 {
+    display: inline-block;
+}
+ul#navigation-bar {
+	list-style: none;
+    font-size: 3vmin;
+    text-align: left;
+    padding-inline-start: 0px;
+    margin: 0;
+	}
+	ul#navigation-bar li {
+		display: inline-block;
+        padding: 10px;
+	}
+
+hr {
+    width: 70vmin;
+}
+
+body { 
+    background-color:#DDD;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+#game-board {   
+    display: grid;
+    grid-template-columns: repeat(var(--grid-size), var(--cell-size));
+    grid-template-rows: repeat(var(--grid-size), var(--cell-size));
+    background-color: #006400; 
+    border-radius: 1vmin;
+    gap: var(--cell-gap);
+    padding: var(--cell-gap);
+    position: relative;
+}
+
+.cellWhite {
+    background-color: #E0E0E0;
+    border-radius: 1vmin;
+
+}
+.cellBlack {
+    background-color: #A9A9A9;
+    border-radius: 1vmin;
+
+}
+
+.piece {
+
+    /* --x: 1;
+    --y: 2; */
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: var(--cell-size);
+    height: var(--cell-size);
+
+    border-radius: 1vmin;
+    top: calc((var(--y) + var(--offsety)) * (var(--cell-size) + var(--cell-gap)) + var(--cell-gap));
+    left: calc((var(--x) + var(--offsetx)) * (var(--cell-size) + var(--cell-gap)) + var(--cell-gap));
+    font-weight: bold;
+    /* background-color: white; */
+    background: var(--backgroundImg);
+    background-size: var(--cell-size);
+    background-color: hsl(200, 50%, var(--background-lightness));
+    color: hsl(200, 25%, var(--text-lightness)); 
+    /* animation: show 300ms ease-in-out;
+    transition: 200ms ease-in-out; */
+    
+}
+
+@keyframes show{
+    0% {
+        opacity: .5;
+        transform: scale(0);
+    }
+}
+
+p {
+    text-align: left;
+    font-size: 2vmin;
+}
