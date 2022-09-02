@@ -59,6 +59,9 @@ export default class Piece {
         this.#pieceElement.style.setProperty("--y", yPosition);
     }
 
+    remove() {
+        this.#pieceElement.remove();
+    }
 
 }
 

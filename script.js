@@ -44,6 +44,7 @@ function handleInput() {
             console.log('making move'); 
             //adjust grid elements and move pieces
             newGrid = {};
+            let newPieceList = [];
             for (let curPiece of pieceList) {
                 let startPosition = [curPiece.x, curPiece.y];
                 //find ending location of piece
@@ -52,13 +53,38 @@ function handleInput() {
                 if (!(newLoc in newGrid)) {
                     newGrid[newLoc] = [];
                 }
-                //update grid
+                //update new grid with moved pieces
                 newGrid[newLoc].push(curPiece.piece);
+                //clear original pieces
+                let gridInd = startPosition[0] + GRID_SIZE*startPosition[1];
+                
+                grid.cells[gridInd].piece.remove();
+                grid.cells[gridInd].piece = undefined;
+                
             }
-
-            //sort 
+            //sort any stacked pieces
             newGrid = updateGrid(newGrid);
 
+            let xloc;
+            let yloc;
+            let gridInd;
+            let locArr;
+            
+            for (let loc in newGrid) {
+                let curPiece = new Piece(gameBoard);
+                locArr = loc.split(',');
+                xloc = parseInt(locArr[0]);
+                yloc = parseInt(locArr[1]);
+                gridInd = xloc + GRID_SIZE*yloc;
+                curPiece.x = xloc;
+                curPiece.y = yloc;
+                curPiece.piece = newGrid[loc][0];
+                grid.cells[gridInd].piece = curPiece;   
+                newPieceList.push(curPiece);             
+
+            }
+            pieceList = newPieceList;
+            console.log(grid.cells);
             if (!grid.allCellsFilled()) {
                 spawnNewPiece();
             }
@@ -102,13 +128,12 @@ function movePiece(startPos, dragVec, curPiece) {
             endPos = moveQueen(dx, dy, startPos);
             break
     }
-    let gridInd = startPos[0] + GRID_SIZE*startPos[1];
-    grid.cells[gridInd].piece = undefined;
+    
 
-    curPiece.x = endPos[0];
-    curPiece.y = endPos[1];
-    gridInd = endPos[0] + GRID_SIZE*endPos[1];
-    grid.cells[gridInd].piece = curPiece;
+    // curPiece.x = endPos[0];
+    // curPiece.y = endPos[1];
+    // gridInd = endPos[0] + GRID_SIZE*endPos[1];
+    // grid.cells[gridInd].piece = curPiece;
     return endPos;
 }
 
@@ -328,8 +353,10 @@ function updateGrid(newGrid) {
         sortByPieceRank(newGrid[loc], sortOrder);
         newPiece = calculateNewPiece(newGrid[loc]);
         newGrid[loc] = [newPiece];
+        // let gridInd = loc[0] + loc[1]*GRID_SIZE;
+        // grid.cells[gridInd].piece = newPiece;
     }
-    console.log(newGrid);
+    return newGrid;
 }
 
 //sorts stacked pieces according to piece rank
