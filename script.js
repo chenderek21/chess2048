@@ -60,8 +60,6 @@ function handleInput() {
             newGrid = updateGrid(newGrid);
 
             if (!grid.allCellsFilled()) {
-                // console.log("spawning new piece");
-                // console.log(grid);
                 spawnNewPiece();
             }
             
@@ -71,11 +69,9 @@ function handleInput() {
     };
     window.onmousemove = function(e) { if(isMouseDown) { 
         dragVec = [e.pageX - startDragX, e.pageY - startDragY];
-        //console.log(`current vector: ${dragVec}`);
         curMagnitude = magnitude(dragVec[0], dragVec[1]);
         //nudge pieces in direction of drag
         for (let curPiece of pieceList){
-            //console.log(curPiece);
             curPiece.offsetx = nudgeDistance(dragVec[0]);
             curPiece.offsety = nudgeDistance(dragVec[1]);
         }
@@ -84,9 +80,6 @@ function handleInput() {
 }
 
 function movePiece(startPos, dragVec, curPiece) {
-    // console.log(startPos);
-    // console.log(dragVec);
-    // console.log(pieceType);
     let pieceType = curPiece.piece;
     let dx = dragVec[0];
     let dy = dragVec[1]; // upward movement is negative dy
@@ -94,23 +87,18 @@ function movePiece(startPos, dragVec, curPiece) {
 
     switch (pieceType) {
         case 'pawn':
-            //pawn movement
             endPos = movePawn(dx, dy, startPos);
             break
         case 'knight':
-            //knight movement
             endPos = moveKnight(dx, dy, startPos);
             break
         case 'bishop':
-            //bishop movement
             endPos = moveBishop(dx, dy, startPos);
             break
         case 'rook':
-            //rook movement
             endPos = moveRook(dx, dy, startPos);
             break
         case 'queen':
-            //queen movement
             endPos = moveQueen(dx, dy, startPos);
             break
     }
@@ -142,10 +130,8 @@ function movePawn(dx, dy, startPos) {
     }
     let curPos = [startPos[0] + moveX, startPos[1] + moveY];
     if (inBounds(curPos)){
-        //console.log("pawn is now at ", curPos);
         return curPos;
     }
-    //console.log("pawn stays at ", startPos);
     return startPos
 
 }
@@ -155,52 +141,42 @@ function moveKnight(dx, dy, startPos) {
     let moveX = 0;
     let moveY = 0;
     if (curTan >= 1 && dx >= 0) {
-        //console.log("down 2 right 1");
         moveX += 1;
         moveY += 2;
     }
     else if (curTan >= 1 && dx < 0) {
-        //console.log("up 2 left 1");
         moveX -= 1;
         moveY -= 2;
     }
     else if ((dx === 0 && dy > 0) || (curTan <= -1 && dx >= 0)) {
-        //console.log("up 2 right 1");
         moveX += 1;
         moveY -= 2;
     }
     else if ((dx === 0 && dy < 0) || (curTan <= -1 && dx < 0)) {
-        //console.log("down 2 left 1");
         moveX -= 1;
         moveY += 2;
     }
     else if (curTan > -1 && curTan <= 0 && dx > 0) {
-        //console.log("right 2 up 1");
         moveX += 2;
         moveY -= 1;
     }
     else if (curTan > -1 && curTan <= 0 && dx < 0) {
-        //console.log("left 2 down 1");
         moveX -= 2;
         moveY += 1;
     }
     else if (curTan > 0 && curTan < 1 && dx > 0) {
-        //console.log("right 2 down 1");
         moveX += 2;
         moveY += 1;
     }
     else if (curTan > 0 && curTan < 1 && dx < 0) {
-        //console.log("left 2 up 1");
         moveX -= 2;
         moveY -= 1;
     }
     let curPos = [startPos[0] + moveX, startPos[1] + moveY];
     
     if (inBounds(curPos)){
-        //console.log("knight is now at ", curPos);
         return curPos;
     }
-    //console.log("knight stays at ", startPos);
     return startPos
 }
 
@@ -209,22 +185,18 @@ function moveBishop(dx, dy, startPos) {
     let moveX = 0;
     let moveY = 0;
     if ((dx === 0 && dy > 0) || (curTan > 0 && dx > 0)) {
-        //console.log("bishop down right");
         moveX += 1;
         moveY += 1;
     }    
     else if ((dx === 0 && dy < 0) || (curTan > 0 && dx < 0)) {
-        //console.log("bishop up left");
         moveX -= 1;
         moveY -= 1;
     }
     else if (curTan <= 0 && dx > 0) {
-        //console.log("bishop up right");
         moveX += 1;
         moveY -= 1;
     }
     else if (curTan <= 0 && dx < 0) {
-        //console.log("bishop down left");
         moveX -= 1;
         moveY += 1;
     }
@@ -235,7 +207,6 @@ function moveBishop(dx, dy, startPos) {
     }
     curPos[0] -= moveX;
     curPos[1] -= moveY;
-    //console.log("bishop is now at ", curPos);
     return curPos;
 
 }
@@ -245,19 +216,15 @@ function moveRook(dx, dy, startPos) {
     let moveX = 0;
     let moveY = 0;
     if ((dx === 0 && dy < 0) || (curTan < -1 && dx > 0) || (curTan > 1 && dx < 0)) {
-        //console.log("rook up");
         moveY -= 1;
     }    
     else if ((dx === 0 && dy > 0) || (curTan < -1 && dx < 0) || (curTan > 1 && dx > 0)) {
-        //console.log("rook down");
         moveY += 1;
     }
     else if (curTan <= 1 && curTan >= -1 && dx > 0) {
-        //console.log("rook right");
         moveX += 1
     }
     else if (curTan <= 1 && curTan >= -1 && dx < 0) {
-        //console.log("rook left");
         moveX -= 1
     }
 
@@ -268,7 +235,6 @@ function moveRook(dx, dy, startPos) {
     }
     curPos[0] -= moveX;
     curPos[1] -= moveY;
-    //console.log("rook is now at ", curPos);
     return curPos;
 }
 
