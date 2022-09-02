@@ -10,30 +10,7 @@ var pieceList = [];
 for (let i = 0; i < 2; i++){
     spawnNewPiece(); 
 }
-// console.log(pieceList);
-// console.log(grid);
-// console.log(grid.cells);
-// console.log(grid.cellsWithPieces());
-// console.log(Math.sqrt(grid.cells.length));
-// console.log(CELL_SIZE);
 
-//testing bishop movement
-let curEmptyCell = grid.randomEmptyCell();
-let curSpawnPiece = 'bishop';
-curEmptyCell.piece = new Piece(gameBoard, curSpawnPiece);
-pieceList.push(curEmptyCell.piece);
-
-//testing rook movement
-curEmptyCell = grid.randomEmptyCell();
-curSpawnPiece = 'rook';
-curEmptyCell.piece = new Piece(gameBoard, curSpawnPiece);
-pieceList.push(curEmptyCell.piece);
-
-//testing queen movement
-curEmptyCell = grid.randomEmptyCell();
-curSpawnPiece = 'queen';
-curEmptyCell.piece = new Piece(gameBoard, curSpawnPiece);
-pieceList.push(curEmptyCell.piece);
 //start of game 
 handleInput();
 
@@ -44,6 +21,8 @@ function handleInput() {
     let curMagnitude = 0;
     let dragVec = [0,0];
     var isMouseDown = false;
+    let newGrid = {};
+    let newLoc;
     //when mouse pressed, record starting position
     window.onmousedown = function(e) { e.preventDefault();
         isMouseDown = true;
@@ -52,7 +31,7 @@ function handleInput() {
         startDragY = e.pageY;
         //console.log(`start: ${startDragX}, ${startDragY}`);
     };
-    //when mouse let go, reset offsets of pieces and make move if drag was large enough
+    //when mouse lets go, reset offsets of pieces and make move if drag was large enough
 
     window.onmouseup   = function(e) { e.preventDefault();
         isMouseDown = false;
@@ -60,20 +39,29 @@ function handleInput() {
             curPiece.offsetx = 0;
             curPiece.offsety = 0;
         }
-        //console.log(pieceList)
+        // if surpassed threshold (large drag), move pieces
         if (curMagnitude > window.innerWidth/4) {
             console.log('making move'); 
             //adjust grid elements and move pieces
-            
+            newGrid = {};
             for (let curPiece of pieceList) {
                 let startPosition = [curPiece.x, curPiece.y];
-                //console.log(curPiece)
-                movePiece(startPosition, dragVec, curPiece);
-
+                //find ending location of piece
+                newLoc = movePiece(startPosition, dragVec, curPiece); 
+               
+                if (!(newLoc in newGrid)) {
+                    newGrid[newLoc] = [];
+                }
+                //update grid
+                newGrid[newLoc].push(curPiece.piece);
             }
+
+            //sort 
+            newGrid = updateGrid(newGrid);
+
             if (!grid.allCellsFilled()) {
-                console.log("spawning new piece");
-                console.log(grid);
+                // console.log("spawning new piece");
+                // console.log(grid);
                 spawnNewPiece();
             }
             
@@ -132,7 +120,8 @@ function movePiece(startPos, dragVec, curPiece) {
     curPiece.x = endPos[0];
     curPiece.y = endPos[1];
     gridInd = endPos[0] + GRID_SIZE*endPos[1];
-    grid.cells[gridInd].piece = curPiece
+    grid.cells[gridInd].piece = curPiece;
+    return endPos;
 }
 
 function movePawn(dx, dy, startPos) {
@@ -361,3 +350,61 @@ function spawnNewPiece(){
     curEmptyCell.piece = new Piece(gameBoard, curSpawnPiece);
     pieceList.push(curEmptyCell.piece);
 }
+
+function updateGrid(newGrid) { 
+    //sorts piece stacks within grid elements and calculates resulting piece
+    let sortOrder = ['pawn', 'knight', 'bishop', 'rook', 'queen'];
+    let newPiece;
+    for (let loc in newGrid){   
+        if (newGrid[loc].length <= 1) {
+            continue
+        }
+        sortByPieceRank(newGrid[loc], sortOrder);
+        newPiece = calculateNewPiece(newGrid[loc]);
+        newGrid[loc] = [newPiece];
+    }
+    console.log(newGrid);
+}
+
+//sorts stacked pieces according to piece rank
+const sortByPieceRank = (arr, desiredOrder) => {
+    const orderForIndexVals = desiredOrder.slice(0).reverse();
+    arr.sort((a, b) => {
+      const aIndex = -orderForIndexVals.indexOf(a);
+      const bIndex = -orderForIndexVals.indexOf(b);
+      return aIndex - bIndex;
+    });
+}
+
+function calculateNewPiece(sortedPieces) {
+
+    if (sortedPieces.length === 1) {
+        return sortedPieces[0];
+    }
+    const pieceValueArr = ['pawn', 'knight', 'bishop', 'rook', 'queen', 'king'];
+    const pieceValueDict = {'pawn': 0, 'knight': 1, 'bishop': 2, 'rook': 3, 'queen': 4, 'king': 5};
+    let r;
+    let curPiece;
+    let curPieceRank;
+    let numPiecesNextRank;
+    // sift pieces upwards and combine/remove until only one element remains
+    //Ex. pawn, pawn, pawn, knight, bishop 
+    //1: knight, knight, bishop
+    //2: bishop, bishop
+    //3: rook (return)
+    while (sortedPieces.length > 1){
+        
+        r = 1;
+        curPiece = sortedPieces[0];
+        curPieceRank = pieceValueDict[curPiece];
+        while (r < sortedPieces.length && sortedPieces[0] === sortedPieces[r]) {
+            r += 1;
+        }
+        numPiecesNextRank = Math.floor(r/2);
+        const tmp1 = Array(numPiecesNextRank).fill(pieceValueArr[curPieceRank+1]);
+        const tmp2 = sortedPieces.splice(r);
+        sortedPieces = tmp1.concat(tmp2);
+    }
+    return sortedPieces[0];
+}
+
