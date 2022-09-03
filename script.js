@@ -324,10 +324,10 @@ function inBounds(endLoc) {
 
 function nudgeDistance(dragDistance) {
     if (dragDistance >= 0){
-        return Math.sqrt(dragDistance)/100;
+        return Math.sqrt(dragDistance)/130;
 
     }
-    return -Math.sqrt(-dragDistance)/100;
+    return -Math.sqrt(-dragDistance)/130;
 }
 
 function magnitude(x,y){

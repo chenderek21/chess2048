@@ -8,13 +8,11 @@
     /* font-family: Clear Sans; */
     font-family: 'Century Gothic', 'serif'
 }
-h1 {
-    font-size: 8vmin;
+
+.logo {
+    height: 14vmin;
     margin: 0.2em 0.1em 0.5em;
-}
-.knight2 {
-    height: 7vmin
-    
+    padding: 0.5em;
 }
 
 h1, knight2 {
