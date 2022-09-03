@@ -1,6 +1,7 @@
 # chess2048
 Strategy/Puzzle game combining chess and 2048!
 
+Playable at: https://chenderek21.github.io/chess2048/
 
 Updates:
 
@@ -12,8 +13,12 @@ Updates:
 
 To do list: 
 
+-Tutorial Page
+
 -Win Indicator + Move Counter
 
 -Animate Piece Movement 
 
--Piece movement preview 
+-Piece movement preview direction
+
+-Themes 
