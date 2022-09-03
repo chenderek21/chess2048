@@ -3,7 +3,7 @@ import Piece from "./Piece.js";
 
 const gameBoard = document.getElementById("game-board");
 const grid = new Grid(gameBoard);
-
+console.log(CELL_SIZE);
 
 //initialization of game board (2 starting pieces)
 var pieceList = [];
@@ -129,11 +129,6 @@ function movePiece(startPos, dragVec, curPiece) {
             break
     }
     
-
-    // curPiece.x = endPos[0];
-    // curPiece.y = endPos[1];
-    // gridInd = endPos[0] + GRID_SIZE*endPos[1];
-    // grid.cells[gridInd].piece = curPiece;
     return endPos;
 }
 
