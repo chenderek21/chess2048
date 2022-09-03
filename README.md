@@ -12,8 +12,12 @@ Updates:
 
 To do list: 
 
+-Tutorial Page
+
 -Win Indicator + Move Counter
 
 -Animate Piece Movement 
 
--Piece movement preview 
+-Piece movement preview direction
+
+-Themes 
