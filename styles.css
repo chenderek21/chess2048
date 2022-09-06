@@ -42,6 +42,11 @@ body {
     text-align: center;
 }
 
+#move-count {
+    padding-bottom: 2vmin;
+    display: inline-block;
+}
+
 #game-board {   
     display: grid;
     grid-template-columns: repeat(var(--grid-size), var(--cell-size));
@@ -84,8 +89,8 @@ body {
     background-size: var(--cell-size);
     background-color: hsl(200, 50%, var(--background-lightness));
     color: hsl(200, 25%, var(--text-lightness)); 
-    /* animation: show 300ms ease-in-out;
-    transition: 200ms ease-in-out; */
+    /*animation: show 300ms ease-in-out;
+    transition: 200ms ease-in-out;*/
     
 }
 
