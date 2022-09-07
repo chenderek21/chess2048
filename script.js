@@ -4,9 +4,11 @@ import Piece from "./Piece.js";
 const gameBoard = document.getElementById("game-board");
 const grid = new Grid(gameBoard);
 let moveCount = 0;
-document.getElementById('move-count').innerHTML = moveCount;
+let won = false;
 //initialization of game board (2 starting pieces)
+
 var pieceList = [];
+document.getElementById('move-count').innerHTML = moveCount;
 for (let i = 0; i < 2; i++){
     spawnNewPiece(); 
 }
@@ -24,6 +26,9 @@ function handleInput() {
     var isMouseDown = false;
     let newGrid = {};
     let newLoc;
+    let startPosition;
+    let xVec;
+    let yVec;
     //when mouse pressed, record starting position
     window.onmousedown = function(e) { e.preventDefault();
         isMouseDown = true;
@@ -39,6 +44,7 @@ function handleInput() {
             curPiece.offsetx = 0;
             curPiece.offsety = 0;
         }
+        
         // if surpassed threshold (large drag), move pieces
         if (curMagnitude > window.innerWidth/4) {
             moveCount += 1;
@@ -50,7 +56,6 @@ function handleInput() {
                 let startPosition = [curPiece.x, curPiece.y];
                 //find ending location of piece
                 newLoc = movePiece(startPosition, dragVec, curPiece); 
-               
                 if (!(newLoc in newGrid)) {
                     newGrid[newLoc] = [];
                 }
@@ -58,11 +63,11 @@ function handleInput() {
                 newGrid[newLoc].push(curPiece.piece);
                 //clear original pieces
                 let gridInd = startPosition[0] + GRID_SIZE*startPosition[1];
-                
                 grid.cells[gridInd].piece.remove();
                 grid.cells[gridInd].piece = undefined;
-                
             }
+
+            
             //sort any stacked pieces
             newGrid = updateGrid(newGrid);
 
@@ -84,43 +89,50 @@ function handleInput() {
                 newPieceList.push(curPiece);             
 
             }
+            
             pieceList = newPieceList;
             if (!grid.allCellsFilled()) {
                 spawnNewPiece();
             }
-            
+        
         }
+        
         curMagnitude = 0
+        // if (won) {
+        //     windicator();
+        //     won = false;
+        // }
         
     };
-    window.onmousemove = function(e) { if(isMouseDown) { 
-        dragVec = [e.pageX - startDragX, e.pageY - startDragY];
-        curMagnitude = magnitude(dragVec[0], dragVec[1]);
-        //nudge pieces in direction of drag
-        if (curMagnitude === 0){
-            return;
-        }
+    window.onmousemove = e => {
+
         if (!isMouseDown){
             return;
         }
+        dragVec = [e.pageX - startDragX, e.pageY - startDragY];
+        curMagnitude = magnitude(dragVec[0], dragVec[1]);
+        if (curMagnitude === 0) {
+            return;
+        }
+        //nudge pieces in direction of currently dragged position according to hypothetical end position
         for (let curPiece of pieceList){
-            let startPosition = [curPiece.x, curPiece.y];
+            startPosition = [curPiece.x, curPiece.y];
             newLoc = movePiece(startPosition, dragVec, curPiece); 
-            let xVec = newLoc[0] - curPiece.x;
-            let yVec = newLoc[1] - curPiece.y;
+            //normalize magnitude and offset calculation 
+            xVec = newLoc[0] - curPiece.x;
+            yVec = newLoc[1] - curPiece.y;
             curPiece.offsetx = nudgeDistance(xVec*Math.min(curMagnitude, window.innerWidth/4));
             curPiece.offsety = nudgeDistance(yVec*Math.min(curMagnitude, window.innerWidth/4));
         }
-     } 
     };
 }
+
 
 function movePiece(startPos, dragVec, curPiece) {
     let pieceType = curPiece.piece;
     let dx = dragVec[0];
     let dy = dragVec[1]; // upward movement is negative dy
     let endPos;
-
     switch (pieceType) {
         case 'pawn':
             endPos = movePawn(dx, dy, startPos);
@@ -138,7 +150,6 @@ function movePiece(startPos, dragVec, curPiece) {
             endPos = moveQueen(dx, dy, startPos);
             break
     }
-    
     return endPos;
 }
 
@@ -203,7 +214,7 @@ function moveKnight(dx, dy, startPos) {
         moveY -= 1;
     }
     let curPos = [startPos[0] + moveX, startPos[1] + moveY];
-    
+
     if (inBounds(curPos)){
         return curPos;
     }
@@ -211,6 +222,7 @@ function moveKnight(dx, dy, startPos) {
 }
 
 function moveBishop(dx, dy, startPos) {
+
     let curTan = dy/dx;
     let moveX = 0;
     let moveY = 0;
@@ -232,16 +244,19 @@ function moveBishop(dx, dy, startPos) {
     }
     let curPos = [startPos[0], startPos[1]];
     while (inBounds(curPos)){
+
         curPos[0] += moveX;
         curPos[1] += moveY;
     }
     curPos[0] -= moveX;
     curPos[1] -= moveY;
+
     return curPos;
 
 }
 
 function moveRook(dx, dy, startPos) {
+
     let curTan = dy/dx;
     let moveX = 0;
     let moveY = 0;
@@ -260,11 +275,13 @@ function moveRook(dx, dy, startPos) {
 
     let curPos = [startPos[0], startPos[1]];
     while (inBounds(curPos)){
+
         curPos[0] += moveX;
         curPos[1] += moveY;
     }
     curPos[0] -= moveX;
     curPos[1] -= moveY;
+
     return curPos;
 }
 
@@ -320,10 +337,9 @@ function inBounds(endLoc) {
 
 function nudgeDistance(dragDistance) {
     if (dragDistance >= 0){
-        return Math.sqrt(dragDistance)/130;
-
+        return Math.sqrt(dragDistance)/150;
     }
-    return -Math.sqrt(-dragDistance)/130;
+    return -Math.sqrt(-dragDistance)/150;
 }
 
 function magnitude(x,y){
@@ -333,7 +349,6 @@ function magnitude(x,y){
 function spawnNewPiece(){
     let curEmptyCell = grid.randomEmptyCell();
     let curSpawnPiece = Math.random() > 0.1 ? 'pawn' : 'knight';
-    console.log(curEmptyCell.x, curEmptyCell.y);
     curEmptyCell.piece = new Piece(gameBoard, curSpawnPiece);
     pieceList.push(curEmptyCell.piece);
 }
@@ -392,6 +407,13 @@ function calculateNewPiece(sortedPieces) {
         const tmp2 = sortedPieces.splice(r);
         sortedPieces = tmp1.concat(tmp2);
     }
+
+    if (sortedPieces[0] === 'king'){
+        won = true;
+    }
     return sortedPieces[0];
 }
 
+function windicator() {
+    window.alert("Congratulations! You saved the king in "+moveCount+ " moves!");
+}
