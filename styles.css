@@ -70,9 +70,6 @@ body {
 }
 
 .piece {
-
-    /* --x: 1;
-    --y: 2; */
     position: absolute;
     display: flex;
     justify-content: center;
@@ -84,14 +81,12 @@ body {
     top: calc((var(--y) + var(--offsety)) * (var(--cell-size) + var(--cell-gap)) + var(--cell-gap));
     left: calc((var(--x) + var(--offsetx)) * (var(--cell-size) + var(--cell-gap)) + var(--cell-gap));
     font-weight: bold;
-    /* background-color: white; */
     background: var(--backgroundImg);
     background-size: var(--cell-size);
     background-color: hsl(200, 50%, var(--background-lightness));
     color: hsl(200, 25%, var(--text-lightness)); 
-    /*animation: show 300ms ease-in-out;
-    transition: 200ms ease-in-out;*/
-    
+    /* animation: show 300ms ease-in-out; */
+    /* transition: 200ms ease-in-out; */
 }
 
 @keyframes show{
