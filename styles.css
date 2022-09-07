@@ -10,8 +10,8 @@
 }
 
 .logo {
-    width: 35vw;
-    padding: 2vh;
+    width: 70vmin;
+    padding: 1%;
 }
 
 h1 {
@@ -40,6 +40,7 @@ body {
     justify-content: center;
     align-items: center;
     text-align: center;
+    overflow: hidden;
 }
 
 #move-count {
@@ -87,6 +88,13 @@ body {
     color: hsl(200, 25%, var(--text-lightness)); 
     /* animation: show 300ms ease-in-out; */
     /* transition: 200ms ease-in-out; */
+}
+
+#mouseDragLine {
+    position: absolute;
+    height: 2px;
+    /* display: none; */
+    background-color: orange;
 }
 
 @keyframes show{

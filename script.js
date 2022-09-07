@@ -30,23 +30,34 @@ function handleInput() {
     let xVec;
     let yVec;
     //when mouse pressed, record starting position
-    window.onmousedown = function(e) { e.preventDefault();
-        isMouseDown = true;
 
+    function mouseDownHandler(e) { 
+        e.preventDefault();
+        isMouseDown = true;
         startDragX = e.pageX;
         startDragY = e.pageY;
     };
+    
+    function touchStartHandler(e) { 
+        isMouseDown = true;
+        startDragX = e.touches[0].pageX;
+        startDragY = e.touches[0].pageY;
+    }
+    window.addEventListener('mousedown', mouseDownHandler);
+    window.addEventListener('touchstart', touchStartHandler);
+
     //when mouse lets go, reset offsets of pieces and make move if drag was large enough
 
     window.onmouseup   = function(e) { e.preventDefault();
         isMouseDown = false;
+        clearLine();
         for (let curPiece of pieceList) {
             curPiece.offsetx = 0;
             curPiece.offsety = 0;
         }
         
         // if surpassed threshold (large drag), move pieces
-        if (curMagnitude > window.innerWidth/4) {
+        if (curMagnitude === 1) {
             moveCount += 1;
             document.getElementById('move-count').innerHTML = moveCount;
             //adjust grid elements and move pieces
@@ -110,7 +121,10 @@ function handleInput() {
             return;
         }
         dragVec = [e.pageX - startDragX, e.pageY - startDragY];
-        curMagnitude = magnitude(dragVec[0], dragVec[1]);
+        drawLine([startDragX, startDragY], [e.pageX, e.pageY]);
+        let x = Math.min(1, magnitude(dragVec[0], dragVec[1]) / dragThreshold());
+        //curMagnitude = (-0.5 / Math.atan(-5)) * (Math.atan(10 * (x - 0.5))) + 0.5;
+        curMagnitude = Math.sin(x*Math.PI/2);
         if (curMagnitude === 0) {
             return;
         }
@@ -118,11 +132,10 @@ function handleInput() {
         for (let curPiece of pieceList){
             startPosition = [curPiece.x, curPiece.y];
             newLoc = movePiece(startPosition, dragVec, curPiece); 
-            //normalize magnitude and offset calculation 
             xVec = newLoc[0] - curPiece.x;
             yVec = newLoc[1] - curPiece.y;
-            curPiece.offsetx = nudgeDistance(xVec*Math.min(curMagnitude, window.innerWidth/4));
-            curPiece.offsety = nudgeDistance(yVec*Math.min(curMagnitude, window.innerWidth/4));
+            curPiece.offsetx = nudgeDistance(xVec*curMagnitude);
+            curPiece.offsety = nudgeDistance(yVec*curMagnitude);
         }
     };
 }
@@ -336,10 +349,9 @@ function inBounds(endLoc) {
 }
 
 function nudgeDistance(dragDistance) {
-    if (dragDistance >= 0){
-        return Math.sqrt(dragDistance)/150;
-    }
-    return -Math.sqrt(-dragDistance)/150;
+
+    return dragDistance;
+
 }
 
 function magnitude(x,y){
@@ -412,6 +424,33 @@ function calculateNewPiece(sortedPieces) {
         won = true;
     }
     return sortedPieces[0];
+}
+
+function drawLine(a, b) {
+    let $mouseDragLine = $('#mouseDragLine');
+    var angle = Math.atan2(a[1]-b[1], a[0]-b[0]) * 180 / Math.PI;
+    var distance = Math.sqrt((a[0] - b[0])**2 + (a[1] - b[1])**2);
+    $mouseDragLine.css('background-color', distance > dragThreshold() ? 'red' : 'orange');
+    // Set Angle
+    $mouseDragLine.css('transform', 'rotate(' + angle + 'deg)');
+    // Set Width
+    $mouseDragLine.css('width', distance + 'px');
+                    
+    // Set Position
+    //$mouseDragLine.offset({top: (a[1]+b[1])/2, left: (a[0]+b[0])/2});
+
+    $mouseDragLine.offset({top: Math.min(a[1],b[1]), left: Math.min(a[0], b[0])});
+    $mouseDragLine.css('display', 'block');
+
+}
+
+function clearLine() {
+
+    $('#mouseDragLine').css('display', 'none');
+}
+
+function dragThreshold() {
+    return window.innerWidth/6;
 }
 
 function windicator() {
