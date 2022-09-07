@@ -42,6 +42,11 @@ body {
     text-align: center;
 }
 
+#move-count {
+    padding-bottom: 2vmin;
+    display: inline-block;
+}
+
 #game-board {   
     display: grid;
     grid-template-columns: repeat(var(--grid-size), var(--cell-size));

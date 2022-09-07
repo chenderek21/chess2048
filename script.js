@@ -3,13 +3,14 @@ import Piece from "./Piece.js";
 
 const gameBoard = document.getElementById("game-board");
 const grid = new Grid(gameBoard);
-console.log(CELL_SIZE);
-
+let moveCount = 0;
+document.getElementById('move-count').innerHTML = moveCount;
 //initialization of game board (2 starting pieces)
 var pieceList = [];
 for (let i = 0; i < 2; i++){
     spawnNewPiece(); 
 }
+
 
 //start of game 
 handleInput();
@@ -29,7 +30,6 @@ function handleInput() {
 
         startDragX = e.pageX;
         startDragY = e.pageY;
-        //console.log(`start: ${startDragX}, ${startDragY}`);
     };
     //when mouse lets go, reset offsets of pieces and make move if drag was large enough
 
@@ -41,7 +41,8 @@ function handleInput() {
         }
         // if surpassed threshold (large drag), move pieces
         if (curMagnitude > window.innerWidth/4) {
-            console.log('making move'); 
+            moveCount += 1;
+            document.getElementById('move-count').innerHTML = moveCount;
             //adjust grid elements and move pieces
             newGrid = {};
             let newPieceList = [];
@@ -84,7 +85,6 @@ function handleInput() {
 
             }
             pieceList = newPieceList;
-            console.log(grid.cells);
             if (!grid.allCellsFilled()) {
                 spawnNewPiece();
             }
@@ -97,9 +97,19 @@ function handleInput() {
         dragVec = [e.pageX - startDragX, e.pageY - startDragY];
         curMagnitude = magnitude(dragVec[0], dragVec[1]);
         //nudge pieces in direction of drag
+        if (curMagnitude === 0){
+            return;
+        }
+        if (!isMouseDown){
+            return;
+        }
         for (let curPiece of pieceList){
-            curPiece.offsetx = nudgeDistance(dragVec[0]);
-            curPiece.offsety = nudgeDistance(dragVec[1]);
+            let startPosition = [curPiece.x, curPiece.y];
+            newLoc = movePiece(startPosition, dragVec, curPiece); 
+            let xVec = newLoc[0] - curPiece.x;
+            let yVec = newLoc[1] - curPiece.y;
+            curPiece.offsetx = nudgeDistance(xVec*Math.min(curMagnitude, window.innerWidth/4));
+            curPiece.offsety = nudgeDistance(yVec*Math.min(curMagnitude, window.innerWidth/4));
         }
      } 
     };
@@ -204,19 +214,19 @@ function moveBishop(dx, dy, startPos) {
     let curTan = dy/dx;
     let moveX = 0;
     let moveY = 0;
-    if ((dx === 0 && dy > 0) || (curTan > 0 && dx > 0)) {
+    if ((dx === 0 && dy >= 0) || (curTan > 0 && dx > 0)) {
         moveX += 1;
         moveY += 1;
     }    
-    else if ((dx === 0 && dy < 0) || (curTan > 0 && dx < 0)) {
+    else if ((dx === 0 && dy <= 0) || (curTan > 0 && dx < 0)) {
         moveX -= 1;
         moveY -= 1;
     }
-    else if (curTan <= 0 && dx > 0) {
+    else if (curTan <= 0 && dx >= 0) {
         moveX += 1;
         moveY -= 1;
     }
-    else if (curTan <= 0 && dx < 0) {
+    else if (curTan <= 0 && dx <= 0) {
         moveX -= 1;
         moveY += 1;
     }
@@ -235,16 +245,16 @@ function moveRook(dx, dy, startPos) {
     let curTan = dy/dx;
     let moveX = 0;
     let moveY = 0;
-    if ((dx === 0 && dy < 0) || (curTan < -1 && dx > 0) || (curTan > 1 && dx < 0)) {
+    if ((dx === 0 && dy <= 0) || (curTan < -1 && dx > 0) || (curTan > 1 && dx < 0)) {
         moveY -= 1;
     }    
-    else if ((dx === 0 && dy > 0) || (curTan < -1 && dx < 0) || (curTan > 1 && dx > 0)) {
+    else if ((dx === 0 && dy >= 0) || (curTan < -1 && dx < 0) || (curTan > 1 && dx > 0)) {
         moveY += 1;
     }
-    else if (curTan <= 1 && curTan >= -1 && dx > 0) {
+    else if (curTan <= 1 && curTan >= -1 && dx >= 0) {
         moveX += 1
     }
-    else if (curTan <= 1 && curTan >= -1 && dx < 0) {
+    else if (curTan <= 1 && curTan >= -1 && dx <= 0) {
         moveX -= 1
     }
 
@@ -263,38 +273,30 @@ function moveQueen(dx, dy, startPos) {
     let moveX = 0;
     let moveY = 0;
     if ((dx === 0 && dy < 0) || (curTan < (-1 - Math.sqrt(2)) && dx > 0) || (curTan > (1+Math.sqrt(2)) && dx < 0)) {
-        //console.log("queen up");
         moveY -= 1;
     }
     else if ((dx === 0 && dy > 0) || (curTan < (-1 - Math.sqrt(2)) && dx < 0) || (curTan > (1+Math.sqrt(2)) && dx > 0)) {
-        //console.log("queen down");
         moveY += 1;
     }
     else if ((curTan < (-1 + Math.sqrt(2)) && curTan > (1 - Math.sqrt(2)) && dx > 0)) {
-        //console.log("queen right");
         moveX += 1
     }
     else if ((curTan < (-1 + Math.sqrt(2)) && curTan > (1 - Math.sqrt(2)) && dx < 0)) {
-        //console.log("queen left");
         moveX -= 1
     }
     else if ((curTan >= (-1 + Math.sqrt(2)) && curTan <= (1 + Math.sqrt(2)) && dx > 0)) {
-        //console.log("queen down right");
         moveX += 1;
         moveY += 1;
     }
     else if ((curTan >= (-1 + Math.sqrt(2)) && curTan <= (1 + Math.sqrt(2)) && dx < 0)) {
-        //console.log("queen up left");
         moveX -= 1;
         moveY -= 1;
     }
     else if ((curTan >= (-1 - Math.sqrt(2)) && curTan <= (1 - Math.sqrt(2)) && dx > 0)) {
-        //console.log("queen up right");
         moveX += 1;
         moveY -= 1;
     }
     else if ((curTan >= (-1 - Math.sqrt(2)) && curTan <= (1 - Math.sqrt(2)) && dx < 0)) {
-        //console.log("queen down left");
         moveX -= 1;
         moveY += 1;
     }
@@ -307,7 +309,6 @@ function moveQueen(dx, dy, startPos) {
     }
     curPos[0] -= moveX;
     curPos[1] -= moveY;
-    //console.log("queen is now at ", curPos);
     return curPos;
 }
 
@@ -348,8 +349,6 @@ function updateGrid(newGrid) {
         sortByPieceRank(newGrid[loc], sortOrder);
         newPiece = calculateNewPiece(newGrid[loc]);
         newGrid[loc] = [newPiece];
-        // let gridInd = loc[0] + loc[1]*GRID_SIZE;
-        // grid.cells[gridInd].piece = newPiece;
     }
     return newGrid;
 }
