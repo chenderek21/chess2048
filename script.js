@@ -12,12 +12,7 @@ document.getElementById('move-count').innerHTML = moveCount;
 for (let i = 0; i < 2; i++){
     spawnNewPiece(); 
 }
-// let curEmptyCell = grid.randomEmptyCell();
-// curEmptyCell.piece = new Piece(gameBoard, 'queen');
-// pieceList.push(curEmptyCell.piece);
-// curEmptyCell = grid.randomEmptyCell();
-// curEmptyCell.piece = new Piece(gameBoard, 'queen');
-// pieceList.push(curEmptyCell.piece);
+
 
 //start of game 
 handleInput();
