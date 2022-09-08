@@ -1,9 +1,11 @@
 # chess2048
-Strategy/Puzzle game combining chess and 2048!
+Strategy/Puzzle game combining Chess and 2048!
 
-Playable at: https://chenderek21.github.io/chess2048/
+Check it out at: https://chenderek21.github.io/chess2048/
 
 Updates:
+
+09/07/22: Implemented piece Movement, move preview, move counter
 
 09/01/22: Implemented piece merging, game can now be played. 
 
@@ -15,10 +17,6 @@ To do list:
 
 -Tutorial Page
 
--Win Indicator + Move Counter
-
--Animate Piece Movement 
-
--Piece movement preview direction
+-Win Indicator 
 
 -Themes 
