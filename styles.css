@@ -17,17 +17,7 @@
 h1 {
     display: inline-block;
 }
-ul#navigation-bar {
-	list-style: none;
-    font-size: 3vmin;
-    text-align: left;
-    padding-inline-start: 0px;
-    margin: 0;
-	}
-	ul#navigation-bar li {
-		display: inline-block;
-        padding: 10px;
-	}
+
 
 hr {
     width: 70vmin;
@@ -43,9 +33,21 @@ body {
     overflow: hidden;
 }
 
+.modal {
+    padding: 1em;
+    max-width: 50ch;
+    border: 0;
+    box-shadow: 0 0 1em rgb(0 0 0 / .3);
+    margin: 0 0 0.5rem 0;
+}
+
+.modal::backdrop {
+    background: rgb(0 0 0 / 0.4);
+  }
+
 #move-count {
-    padding-bottom: 2vmin;
     display: inline-block;
+
 }
 
 #game-board {   
@@ -107,4 +109,6 @@ body {
 p {
     text-align: left;
     font-size: 2vmin;
+    margin-bottom: none;
+    margin-top: 0;
 }

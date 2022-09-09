@@ -5,12 +5,27 @@ const gameBoard = document.getElementById("game-board");
 const grid = new Grid(gameBoard);
 let moveCount = 0;
 let won = false;
-//initialization of game board (2 starting pieces)
+
+// const modal = document.querySelector("#modal");
+// const openModal = document.querySelector(".open-button");
+// const closeModal = document.querySelector(".close-button");
+
+// openModal.addEventListener("click", () => {
+//   modal.showModal();
+// });
+
+// closeModal.addEventListener("click", () => {
+//   modal.close();
+// });
+
 
 var pieceList = [];
 document.getElementById('move-count').innerHTML = moveCount;
+
+//initialization of game board (2 starting pieces)
 for (let i = 0; i < 2; i++){
     spawnNewPiece(); 
+    //spawnQueen();
 }
 
 
@@ -160,7 +175,10 @@ function movePiece(startPos, dragVec, curPiece) {
             endPos = moveRook(dx, dy, startPos);
             break
         case 'queen':
-            endPos = moveQueen(dx, dy, startPos);
+            endPos = moveQueen(dx, dy, startPos, false);
+            break
+        case 'king':
+            endPos = moveQueen(dx, dy, startPos, true);
             break
     }
     return endPos;
@@ -298,7 +316,7 @@ function moveRook(dx, dy, startPos) {
     return curPos;
 }
 
-function moveQueen(dx, dy, startPos) {
+function moveQueen(dx, dy, startPos, isKing) {
     let curTan = dy/dx;
     let moveX = 0;
     let moveY = 0;
@@ -330,10 +348,17 @@ function moveQueen(dx, dy, startPos) {
         moveX -= 1;
         moveY += 1;
     }
+    //king movement
+    if (isKing) {
+        let curPos = [startPos[0] + moveX, startPos[1] + moveY];
+        if (inBounds(curPos)) {
+            return curPos;
+        }
+        return startPos
+    }
+    //queen movement
     let curPos = [startPos[0], startPos[1]];
-    
     while (inBounds(curPos)){
-        
         curPos[0] += moveX;
         curPos[1] += moveY;
     }
@@ -342,6 +367,8 @@ function moveQueen(dx, dy, startPos) {
     return curPos;
 }
 
+
+//determines if ending location of piece is in bounds
 function inBounds(endLoc) {
     let endx = endLoc[0];
     let endy = endLoc[1];
@@ -349,9 +376,7 @@ function inBounds(endLoc) {
 }
 
 function nudgeDistance(dragDistance) {
-
     return dragDistance;
-
 }
 
 function magnitude(x,y){
@@ -365,9 +390,16 @@ function spawnNewPiece(){
     pieceList.push(curEmptyCell.piece);
 }
 
+//spawns a queen (for windicator testing purposes) 
+function spawnQueen(){
+    let curEmptyCell = grid.randomEmptyCell();
+    curEmptyCell.piece = new Piece(gameBoard, 'queen');
+    pieceList.push(curEmptyCell.piece);
+}
+
 function updateGrid(newGrid) { 
     //sorts piece stacks within grid elements and calculates resulting piece
-    let sortOrder = ['pawn', 'knight', 'bishop', 'rook', 'queen'];
+    let sortOrder = ['pawn', 'knight', 'bishop', 'rook', 'queen', 'king'];
     let newPiece;
     for (let loc in newGrid){   
         if (newGrid[loc].length <= 1) {
@@ -380,7 +412,7 @@ function updateGrid(newGrid) {
     return newGrid;
 }
 
-//sorts stacked pieces according to piece rank
+//sorts stacked pieces according to piece rank as defined in updateGrid()
 const sortByPieceRank = (arr, desiredOrder) => {
     const orderForIndexVals = desiredOrder.slice(0).reverse();
     arr.sort((a, b) => {
@@ -391,7 +423,6 @@ const sortByPieceRank = (arr, desiredOrder) => {
 }
 
 function calculateNewPiece(sortedPieces) {
-
     if (sortedPieces.length === 1) {
         return sortedPieces[0];
     }
@@ -402,12 +433,11 @@ function calculateNewPiece(sortedPieces) {
     let curPieceRank;
     let numPiecesNextRank;
     // sift pieces upwards and combine/remove until only one element remains
-    //Ex. pawn, pawn, pawn, knight, bishop 
-    //1: knight, knight, bishop
-    //2: bishop, bishop
-    //3: rook (return)
+    //Ex. pawn, pawn, pawn, knight, bishop -->
+    //1: knight, knight, bishop -->
+    //2: bishop, bishop -->
+    //3: rook (return) 
     while (sortedPieces.length > 1){
-        
         r = 1;
         curPiece = sortedPieces[0];
         curPieceRank = pieceValueDict[curPiece];
@@ -426,6 +456,7 @@ function calculateNewPiece(sortedPieces) {
     return sortedPieces[0];
 }
 
+//function to draw direction indicator (jquery) 
 function drawLine(a, b) {
     let $mouseDragLine = $('#mouseDragLine');
     var angle = Math.atan2(a[1]-b[1], a[0]-b[0]) * 180 / Math.PI;
@@ -434,18 +465,14 @@ function drawLine(a, b) {
     // Set Angle
     $mouseDragLine.css('transform', 'rotate(' + angle + 'deg)');
     // Set Width
-    $mouseDragLine.css('width', distance + 'px');
-                    
+    $mouseDragLine.css('width', distance + 'px');       
     // Set Position
-    //$mouseDragLine.offset({top: (a[1]+b[1])/2, left: (a[0]+b[0])/2});
-
     $mouseDragLine.offset({top: Math.min(a[1],b[1]), left: Math.min(a[0], b[0])});
     $mouseDragLine.css('display', 'block');
-
 }
 
+//clear line upon mouse release
 function clearLine() {
-
     $('#mouseDragLine').css('display', 'none');
 }
 
