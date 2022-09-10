@@ -53,6 +53,7 @@ body {
     width: 40vmin;
     margin: 0 auto;
     height: 1.75em;
+    font-size: 2.5vmin;
 }
 
 #counter > div{
@@ -83,8 +84,8 @@ body {
 }
 
 #menu button svg {
-    height: 1.75em;
-    width: 1.75em;
+    height: 3vmin;
+    width: 3vmin;
 }
 
 .modal {
