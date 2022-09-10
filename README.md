@@ -5,6 +5,10 @@ Check it out at: https://chenderek21.github.io/chess2048/
 
 Updates:
 
+09/09/22: Added Tutorial Modal
+
+09/08/22: Added King Movement, fixed freezing bug
+
 09/07/22: Implemented piece Movement, move preview, move counter
 
 09/01/22: Implemented piece merging, game can now be played. 
@@ -14,8 +18,6 @@ Updates:
 08/29/22: Created grid, cell, and piece classes. Implemented HTML+CSS
 
 To do list: 
-
--Tutorial Page
 
 -Win Indicator 
 
