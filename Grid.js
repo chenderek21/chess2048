@@ -1,6 +1,6 @@
-export const GRID_SIZE = 4
-export const CELL_SIZE = Math.floor(60/GRID_SIZE)
-const CELL_GAP = CELL_SIZE/10
+export const GRID_SIZE = 4;
+export const CELL_SIZE = Math.floor(60/GRID_SIZE);
+const CELL_GAP = CELL_SIZE/10;
 export class Grid {
     #cells;
 

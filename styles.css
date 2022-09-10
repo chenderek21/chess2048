@@ -1,12 +1,11 @@
 @font-face{
-    src: url(fonts/ClearSans-Regular.ttf);
-    font-family: Clear Sans;
+    src: url(fonts/CenturyGothic.ttf);
+    font-family: 'Century Gothic';
 }
 
 *, *::before, *::after {
     box-sizing: border-box;
-    /* font-family: Clear Sans; */
-    font-family: 'Century Gothic', 'serif'
+    font-family: 'Century Gothic';
 }
 
 .logo {
@@ -18,6 +17,11 @@ h1 {
     display: inline-block;
 }
 
+h2 {
+    margin-top: 1vmin;
+    font-size: 3.5vmin;
+    margin-bottom: 1vmin;
+}
 
 hr {
     width: 70vmin;
@@ -33,17 +37,88 @@ body {
     overflow: hidden;
 }
 
+#menu {
+    display: block;
+    column-gap: .5em;
+    position: relative;
+    margin-bottom: 1vmin;
+}
+
+#menu > div{
+    width: 67vmin;
+    
+}
+
+#counter{
+    width: 40vmin;
+    margin: 0 auto;
+    height: 1.75em;
+}
+
+#counter > div{
+    padding-top: 0.25vmin;
+}
+
+#menu button,
+.dialog-close {
+    cursor: pointer;
+    background: transparent;
+    border: none;
+    padding: 0;
+    margin-left: 0.5vmin;
+}
+
+.close-button {
+    font-size: 3vmin;
+    
+}
+
+#close-modal {
+    font-size: 1.75vmin;
+}
+
+#buttons {
+    float: right;
+    display: inline;
+}
+
+#menu button svg {
+    height: 1.75em;
+    width: 1.75em;
+}
+
 .modal {
     padding: 1em;
-    max-width: 50ch;
-    border: 0;
+    max-width: 90vmin;
     box-shadow: 0 0 1em rgb(0 0 0 / .3);
-    margin: 0 0 0.5rem 0;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5vmin;
 }
 
 .modal::backdrop {
     background: rgb(0 0 0 / 0.4);
   }
+
+a, a:focus{
+
+/* border: inherit; */
+outline:none;
+} 
+
+#piece-icon {
+    height: 4vmin;
+    width: 4vmin;
+    display: inline;
+    position: relative;
+    vertical-align: top;
+
+}
+
 
 #move-count {
     display: inline-block;
@@ -109,6 +184,14 @@ body {
 p {
     text-align: left;
     font-size: 2vmin;
-    margin-bottom: none;
+    margin-bottom: 1.5vmin;
     margin-top: 0;
+}
+
+#arrows {
+    font-size: 3vmin;
+}
+
+#addition {
+    font-size: 3.25vmin;
 }

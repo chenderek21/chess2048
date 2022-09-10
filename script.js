@@ -6,18 +6,10 @@ const grid = new Grid(gameBoard);
 let moveCount = 0;
 let won = false;
 
-// const modal = document.querySelector("#modal");
-// const openModal = document.querySelector(".open-button");
-// const closeModal = document.querySelector(".close-button");
+const modal = document.querySelector("#modal");
 
-// openModal.addEventListener("click", () => {
-//   modal.showModal();
-// });
-
-// closeModal.addEventListener("click", () => {
-//   modal.close();
-// });
-
+$("#tutorial-button").click(() => modal.showModal());
+$(".close-button").click(() => modal.close());
 
 var pieceList = [];
 document.getElementById('move-count').innerHTML = moveCount;
@@ -25,9 +17,8 @@ document.getElementById('move-count').innerHTML = moveCount;
 //initialization of game board (2 starting pieces)
 for (let i = 0; i < 2; i++){
     spawnNewPiece(); 
-    //spawnQueen();
+    // spawnQueen();
 }
-
 
 //start of game 
 handleInput();
@@ -39,7 +30,6 @@ function handleInput() {
     let curMagnitude = 0;
     let dragVec = [0,0];
     var isMouseDown = false;
-    let newGrid = {};
     let newLoc;
     let startPosition;
     let xVec;
@@ -63,7 +53,8 @@ function handleInput() {
 
     //when mouse lets go, reset offsets of pieces and make move if drag was large enough
 
-    window.onmouseup   = function(e) { e.preventDefault();
+    window.onmouseup   = function(e) { 
+        e.preventDefault();
         isMouseDown = false;
         clearLine();
         for (let curPiece of pieceList) {
@@ -73,54 +64,7 @@ function handleInput() {
         
         // if surpassed threshold (large drag), move pieces
         if (curMagnitude === 1) {
-            moveCount += 1;
-            document.getElementById('move-count').innerHTML = moveCount;
-            //adjust grid elements and move pieces
-            newGrid = {};
-            let newPieceList = [];
-            for (let curPiece of pieceList) {
-                let startPosition = [curPiece.x, curPiece.y];
-                //find ending location of piece
-                newLoc = movePiece(startPosition, dragVec, curPiece); 
-                if (!(newLoc in newGrid)) {
-                    newGrid[newLoc] = [];
-                }
-                //update new grid with moved pieces
-                newGrid[newLoc].push(curPiece.piece);
-                //clear original pieces
-                let gridInd = startPosition[0] + GRID_SIZE*startPosition[1];
-                grid.cells[gridInd].piece.remove();
-                grid.cells[gridInd].piece = undefined;
-            }
-
-            
-            //sort any stacked pieces
-            newGrid = updateGrid(newGrid);
-
-            let xloc;
-            let yloc;
-            let gridInd;
-            let locArr;
-            
-            for (let loc in newGrid) {
-                let curPiece = new Piece(gameBoard);
-                locArr = loc.split(',');
-                xloc = parseInt(locArr[0]);
-                yloc = parseInt(locArr[1]);
-                gridInd = xloc + GRID_SIZE*yloc;
-                curPiece.x = xloc;
-                curPiece.y = yloc;
-                curPiece.piece = newGrid[loc][0];
-                grid.cells[gridInd].piece = curPiece;   
-                newPieceList.push(curPiece);             
-
-            }
-            
-            pieceList = newPieceList;
-            if (!grid.allCellsFilled()) {
-                spawnNewPiece();
-            }
-        
+            makeMove(dragVec);
         }
         
         curMagnitude = 0
@@ -483,3 +427,57 @@ function dragThreshold() {
 function windicator() {
     window.alert("Congratulations! You saved the king in "+moveCount+ " moves!");
 }
+
+function makeMove(curDragVec) {
+    moveCount += 1;
+    document.getElementById('move-count').innerHTML = moveCount;
+    //adjust grid elements and move pieces
+    let newGrid = {};
+    let newPieceList = [];
+    for (let curPiece of pieceList) {
+        let startPosition = [curPiece.x, curPiece.y];
+        //find ending location of piece
+        let newLoc = movePiece(startPosition, curDragVec, curPiece); 
+        if (!(newLoc in newGrid)) {
+            newGrid[newLoc] = [];
+        }
+        //update new grid with moved pieces
+        newGrid[newLoc].push(curPiece.piece);
+        //clear original pieces
+        let gridInd = startPosition[0] + GRID_SIZE*startPosition[1];
+        grid.cells[gridInd].piece.remove();
+        grid.cells[gridInd].piece = undefined;
+    }
+
+    //sort any stacked pieces
+    newGrid = updateGrid(newGrid);
+
+    let xloc;
+    let yloc;
+    let gridInd;
+    let locArr;
+    
+    for (let loc in newGrid) {
+        let curPiece = new Piece(gameBoard);
+        locArr = loc.split(',');
+        xloc = parseInt(locArr[0]);
+        yloc = parseInt(locArr[1]);
+        gridInd = xloc + GRID_SIZE*yloc;
+        curPiece.x = xloc;
+        curPiece.y = yloc;
+        curPiece.piece = newGrid[loc][0];
+        grid.cells[gridInd].piece = curPiece;   
+        newPieceList.push(curPiece);             
+    }
+    
+    pieceList = newPieceList;
+    if (!grid.allCellsFilled()) {
+        spawnNewPiece();
+    }
+}
+
+function makeRandomMove() {
+    let angle = Math.random() * 2 * Math.PI;
+    makeMove([Math.sin(angle), Math.cos(angle)]);
+}
+// setInterval(makeRandomMove, 1);
