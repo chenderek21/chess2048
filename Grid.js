@@ -15,7 +15,6 @@ export class Grid {
                 Math.floor(index / GRID_SIZE) //y
             );
         });
-        //console.log(this.#cells)
     }
     get cells() {
         return this.#cells;
@@ -77,7 +76,7 @@ function createCellElements(gridElement) {
         const curRow = Math.floor(i/GRID_SIZE)
         const curCol = i%GRID_SIZE
         const cell = document.createElement("div")
-        //creates checkerboard pattern
+        //generate checkerboard pattern
         if ((curRow+curCol)%2 == 0){
             cell.classList.add("cellWhite")
         }

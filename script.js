@@ -7,10 +7,12 @@ let moveCount = 0;
 let won = false;
 
 const modal = document.querySelector("#modal");
+const modal_settings = document.querySelector("#modal-settings");
 
 $("#tutorial-button").click(() => modal.showModal());
 $(".close-button").click(() => modal.close());
-
+$("#settings-button").click(() => modal_settings.showModal());
+$(".close-button").click(() => modal_settings.close());
 var pieceList = [];
 document.getElementById('move-count').innerHTML = moveCount;
 
@@ -51,7 +53,7 @@ function handleInput() {
     window.addEventListener('mousedown', mouseDownHandler);
     window.addEventListener('touchstart', touchStartHandler);
 
-    //when mouse lets go, reset offsets of pieces and make move if drag was large enough
+    //when mouse lets go, make move if drag was large enough
 
     window.onmouseup   = function(e) { 
         e.preventDefault();

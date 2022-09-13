@@ -84,8 +84,8 @@ body {
 }
 
 #menu button svg {
-    height: 3vmin;
-    width: 3vmin;
+    height: 3.5vmin;
+    width: 3.5vmin;
 }
 
 .modal {
@@ -104,6 +104,10 @@ body {
 .modal::backdrop {
     background: rgb(0 0 0 / 0.4);
   }
+
+#modal-settings {
+    width: 70vmin;
+}
 
 a, a:focus{
 
