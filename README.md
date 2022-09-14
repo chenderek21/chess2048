@@ -1,7 +1,7 @@
 # chess2048
-Strategy/Puzzle game combining Chess and 2048!
+Strategy/Puzzle game combining Chess and 2048! Pieces move as they do in Chess, but combine (similarly) as they do in 2048.
 
-Check it out at: https://chenderek21.github.io/chess2048/
+Check it out here: https://chenderek21.github.io/chess2048/
 
 Updates:
 
