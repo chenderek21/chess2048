@@ -71,7 +71,10 @@ body {
 
 .close-button {
     font-size: 3vmin;
-    
+}
+
+.close-windicator {
+    font-size: 3vmin;
 }
 
 #close-modal {
@@ -101,6 +104,14 @@ body {
     margin-bottom: 1.5vmin;
 }
 
+.modal-footer button {
+    margin-left: 3vmin;
+    margin-right: 3vmin;
+}
+
+#modal-windicator .modal-header h2{
+    width: 100%;
+}
 .modal::backdrop {
     background: rgb(0 0 0 / 0.4);
   }
@@ -200,3 +211,4 @@ p {
 #addition {
     font-size: 3.25vmin;
 }
+

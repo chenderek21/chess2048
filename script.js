@@ -5,22 +5,31 @@ const gameBoard = document.getElementById("game-board");
 const grid = new Grid(gameBoard);
 let moveCount = 0;
 let won = false;
-
+let alreadyWon = false;
 const modal = document.querySelector("#modal");
 const modal_settings = document.querySelector("#modal-settings");
+const modal_windicator = document.querySelector("#modal-windicator");
 
 $("#tutorial-button").click(() => modal.showModal());
 $(".close-button").click(() => modal.close());
 $("#settings-button").click(() => modal_settings.showModal());
 $(".close-button").click(() => modal_settings.close());
+$(".close-windicator").click(() => {
+    won = false; 
+    modal_windicator.close();
+});
+$(".restart").click(() => location.reload());
 var pieceList = [];
 document.getElementById('move-count').innerHTML = moveCount;
+
+
 
 //initialization of game board (2 starting pieces)
 for (let i = 0; i < 2; i++){
     spawnNewPiece(); 
-    // spawnQueen();
+    //spawnQueen();
 }
+
 
 //start of game 
 handleInput();
@@ -39,6 +48,9 @@ function handleInput() {
     //when mouse pressed, record starting position
 
     function mouseDownHandler(e) { 
+        if (won) {
+            return
+        }
         e.preventDefault();
         isMouseDown = true;
         startDragX = e.pageX;
@@ -46,6 +58,9 @@ function handleInput() {
     };
     
     function touchStartHandler(e) { 
+        if (won) {
+            return
+        }
         isMouseDown = true;
         startDragX = e.touches[0].pageX;
         startDragY = e.touches[0].pageY;
@@ -70,12 +85,14 @@ function handleInput() {
         }
         
         curMagnitude = 0
-        // if (won) {
-        //     windicator();
-        //     won = false;
-        // }
-        
+        if (won) {
+            if (!alreadyWon) { 
+                alreadyWon = true
+            }
+            windicator();
+        }
     };
+
     window.onmousemove = e => {
 
         if (!isMouseDown){
@@ -331,6 +348,9 @@ function magnitude(x,y){
 
 function spawnNewPiece(){
     let curEmptyCell = grid.randomEmptyCell();
+    if (!curEmptyCell) {
+        return
+    }
     let curSpawnPiece = Math.random() > 0.1 ? 'pawn' : 'knight';
     curEmptyCell.piece = new Piece(gameBoard, curSpawnPiece);
     pieceList.push(curEmptyCell.piece);
@@ -339,6 +359,9 @@ function spawnNewPiece(){
 //spawns a queen (for windicator testing purposes) 
 function spawnQueen(){
     let curEmptyCell = grid.randomEmptyCell();
+    if (!curEmptyCell) {
+        return
+    }
     curEmptyCell.piece = new Piece(gameBoard, 'queen');
     pieceList.push(curEmptyCell.piece);
 }
@@ -397,7 +420,9 @@ function calculateNewPiece(sortedPieces) {
     }
 
     if (sortedPieces[0] === 'king'){
-        won = true;
+        if (!alreadyWon) {
+            won = true;
+        }
     }
     return sortedPieces[0];
 }
@@ -426,13 +451,10 @@ function dragThreshold() {
     return window.innerWidth/6;
 }
 
-function windicator() {
-    window.alert("Congratulations! You saved the king in "+moveCount+ " moves!");
-}
-
 function makeMove(curDragVec) {
     moveCount += 1;
     document.getElementById('move-count').innerHTML = moveCount;
+    document.getElementById('num-moves').innerHTML = moveCount;
     //adjust grid elements and move pieces
     let newGrid = {};
     let newPieceList = [];
@@ -469,7 +491,8 @@ function makeMove(curDragVec) {
         curPiece.y = yloc;
         curPiece.piece = newGrid[loc][0];
         grid.cells[gridInd].piece = curPiece;   
-        newPieceList.push(curPiece);             
+        newPieceList.push(curPiece);   
+          
     }
     
     pieceList = newPieceList;
@@ -483,3 +506,8 @@ function makeRandomMove() {
     makeMove([Math.sin(angle), Math.cos(angle)]);
 }
 // setInterval(makeRandomMove, 1);
+
+
+function windicator() {
+    modal_windicator.showModal();
+}
