@@ -5,6 +5,8 @@ Check it out here: https://chenderek21.github.io/chess2048/
 
 Updates:
 
+09/21/22: Added Windicator Modal
+
 09/09/22: Added Tutorial Modal
 
 09/08/22: Added King Movement, fixed freezing bug
@@ -19,6 +21,6 @@ Updates:
 
 To do list: 
 
--Win Indicator 
+-Settings
 
--Themes 
+-Mobile Compatibility
