@@ -5,6 +5,10 @@ Check it out here: https://chenderek21.github.io/chess2048/
 
 Updates:
 
+10/6/22: Added Fairy Pieces (archbishop)
+
+09/21/22: Added Windicator Modal
+
 09/09/22: Added Tutorial Modal
 
 09/08/22: Added King Movement, fixed freezing bug
@@ -19,6 +23,6 @@ Updates:
 
 To do list: 
 
--Win Indicator 
+-Themes
 
--Themes 
+-Mobile Compatibility
