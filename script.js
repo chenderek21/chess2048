@@ -143,6 +143,15 @@ function movePiece(startPos, dragVec, curPiece) {
         case 'king':
             endPos = moveQueen(dx, dy, startPos, true);
             break
+        case 'archbishop':
+            endPos = moveArchbishop(dx, dy, startPos);
+            break
+        case 'chancellor':
+            endPos = moveChancellor(dx, dy, startPos);
+            break
+        case 'amazon':
+            endPos = moveAmazon(dx, dy, startPos);
+            break
     }
     return endPos;
 }
@@ -330,6 +339,48 @@ function moveQueen(dx, dy, startPos, isKing) {
     return curPos;
 }
 
+function moveArchbishop(dx, dy, startPos) {
+    let curTan = dy/dx;
+    let tanLimitUpper = Math.tan((Math.atan(2) + Math.atan(1))/2);
+    let tanLimitLower = Math.tan((Math.atan(0.5) + Math.atan(1))/2);
+
+    if ((curTan <= tanLimitUpper && curTan >= tanLimitLower) || (curTan >= -tanLimitUpper && curTan <= -tanLimitLower)) {
+        return moveBishop(dx, dy, startPos);
+    }
+    else {
+        return moveKnight(dx, dy, startPos);
+    }
+
+}
+
+function moveChancellor(dx, dy, startPos) { 
+    let curTan = dy/dx;
+    let tanLimitUpperRook = Math.tan(Math.atan(0.5)/2);
+    let tanLimitLowerRook = Math.tan((Math.atan(2) + Math.PI/2)/2);
+    if (dx == 0 || (curTan <= tanLimitUpperRook && curTan >= -tanLimitUpperRook) || (Math.abs(curTan) >= tanLimitLowerRook)) {
+        return moveRook(dx, dy, startPos);
+    }
+    else {
+        return moveKnight(dx, dy, startPos);
+    }
+}
+
+function moveAmazon(dx, dy, startPos) {
+    let curTan = dy/dx;
+    let tanLimitUpperRook = Math.tan(Math.atan(1)/2);
+    let tanLimitLowerRook = Math.tan((Math.atan(2) + Math.PI/2)/2);
+    let tanLimitUpperBishop = Math.tan((Math.atan(2) + Math.atan(1))/2);
+    let tanLimitLowerBishop = Math.tan((Math.atan(0.5) + Math.atan(1))/2);
+    if (dx == 0 || curTan <= tanLimitUpperRook && curTan >= -tanLimitUpperRook || Math.abs(curTan) >= tanLimitLowerRook) {
+        return moveRook(dx, dy, startPos);
+    }
+    else if ((curTan <= tanLimitUpperBishop && curTan >= tanLimitLowerBishop) || (curTan >= -tanLimitUpperBishop && curTan <= -tanLimitLowerBishop)) {
+        return moveBishop(dx, dy, startPos);
+    }
+    else {
+        return moveKnight(dx, dy, startPos);
+    }
+}
 
 //determines if ending location of piece is in bounds
 function inBounds(endLoc) {
@@ -368,7 +419,7 @@ function spawnQueen(){
 
 function updateGrid(newGrid) { 
     //sorts piece stacks within grid elements and calculates resulting piece
-    let sortOrder = ['pawn', 'knight', 'bishop', 'rook', 'queen', 'king'];
+    let sortOrder = ['pawn', 'knight', 'bishop', 'rook', 'queen', 'king', 'archbishop', 'chancellor', 'amazon'];
     let newPiece;
     for (let loc in newGrid){   
         if (newGrid[loc].length <= 1) {
@@ -395,8 +446,8 @@ function calculateNewPiece(sortedPieces) {
     if (sortedPieces.length === 1) {
         return sortedPieces[0];
     }
-    const pieceValueArr = ['pawn', 'knight', 'bishop', 'rook', 'queen', 'king'];
-    const pieceValueDict = {'pawn': 0, 'knight': 1, 'bishop': 2, 'rook': 3, 'queen': 4, 'king': 5};
+    const pieceValueArr = ['pawn', 'knight', 'bishop', 'rook', 'queen', 'king', 'archbishop', 'chancellor', 'amazon'];
+    const pieceValueDict = {'pawn': 0, 'knight': 1, 'bishop': 2, 'rook': 3, 'queen': 4, 'king': 5, 'archbishop': 6, 'chancellor': 7, 'amazon': 8};
     let r;
     let curPiece;
     let curPieceRank;
@@ -419,7 +470,7 @@ function calculateNewPiece(sortedPieces) {
         sortedPieces = tmp1.concat(tmp2);
     }
 
-    if (sortedPieces[0] === 'king'){
+    if (pieceValueDict[sortedPieces[0]] >= pieceValueDict['king']){
         if (!alreadyWon) {
             won = true;
         }
