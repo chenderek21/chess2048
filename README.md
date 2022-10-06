@@ -5,7 +5,7 @@ Check it out here: https://chenderek21.github.io/chess2048/
 
 Updates:
 
-10/6/22: Added Fairy Pieces (archbishop)
+10/6/22: Added Fairy Pieces (archbishop, chancellor, amazon)
 
 09/21/22: Added Windicator Modal
 
