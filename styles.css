@@ -179,8 +179,11 @@ outline:none;
     background-size: var(--cell-size);
     background-color: hsl(200, 50%, var(--background-lightness));
     color: hsl(200, 25%, var(--text-lightness)); 
-    /* animation: show 300ms ease-in-out; */
-    /* transition: 200ms ease-in-out; */
+    /*animation: show 300ms ease-in-out; */
+}
+
+.piece.newPiece {
+    animation: show 300ms ease-in-out; 
 }
 
 #mouseDragLine {

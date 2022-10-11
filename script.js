@@ -6,14 +6,21 @@ const grid = new Grid(gameBoard);
 let moveCount = 0;
 let won = false;
 let alreadyWon = false;
+let modalOpen = false;
 const modal = document.querySelector("#modal");
 const modal_settings = document.querySelector("#modal-settings");
 const modal_windicator = document.querySelector("#modal-windicator");
 
 $("#tutorial-button").click(() => modal.showModal());
 $(".close-button").click(() => modal.close());
-$("#settings-button").click(() => modal_settings.showModal());
-$(".close-button").click(() => modal_settings.close());
+$("#settings-button").click(() => {
+    modalOpen = true;
+    modal_settings.showModal();
+});
+$(".close-button").click(() => {
+    modalOpen = false;
+    modal_settings.close();
+});
 $(".close-windicator").click(() => {
     won = false; 
     modal_windicator.close();
@@ -151,6 +158,9 @@ function movePiece(startPos, dragVec, curPiece) {
             break
         case 'amazon':
             endPos = moveAmazon(dx, dy, startPos);
+            break
+        case 'mann':
+            endPos = moveQueen(dx, dy, startPos, true);
             break
     }
     return endPos;
@@ -404,6 +414,7 @@ function spawnNewPiece(){
     }
     let curSpawnPiece = Math.random() > 0.1 ? 'pawn' : 'knight';
     curEmptyCell.piece = new Piece(gameBoard, curSpawnPiece);
+    curEmptyCell.piece.markNewPiece();
     pieceList.push(curEmptyCell.piece);
 }
 
@@ -419,7 +430,7 @@ function spawnQueen(){
 
 function updateGrid(newGrid) { 
     //sorts piece stacks within grid elements and calculates resulting piece
-    let sortOrder = ['pawn', 'knight', 'bishop', 'rook', 'queen', 'king', 'archbishop', 'chancellor', 'amazon'];
+    let sortOrder = ['pawn', 'knight', 'bishop', 'rook', 'queen', 'king', 'archbishop', 'chancellor', 'amazon', 'mann'];
     let newPiece;
     for (let loc in newGrid){   
         if (newGrid[loc].length <= 1) {
@@ -446,12 +457,14 @@ function calculateNewPiece(sortedPieces) {
     if (sortedPieces.length === 1) {
         return sortedPieces[0];
     }
-    const pieceValueArr = ['pawn', 'knight', 'bishop', 'rook', 'queen', 'king', 'archbishop', 'chancellor', 'amazon'];
-    const pieceValueDict = {'pawn': 0, 'knight': 1, 'bishop': 2, 'rook': 3, 'queen': 4, 'king': 5, 'archbishop': 6, 'chancellor': 7, 'amazon': 8};
+    const pieceValueArr = ['pawn', 'knight', 'bishop', 'rook', 'queen', 'king', 'archbishop', 'chancellor', 'amazon', 'mann'];
+    const pieceValueDict = {'pawn': 0, 'knight': 1, 'bishop': 2, 'rook': 3, 'queen': 4, 'king': 5, 'archbishop': 6, 'chancellor': 7, 'amazon': 8, 'mann': 9};
     let r;
     let curPiece;
     let curPieceRank;
     let numPiecesNextRank;
+    let curMaxPiece = pieceValueDict[sortedPieces[sortedPieces.length - 1]];
+    let newPiece = false;
     // sift pieces upwards and combine/remove until only one element remains
     //Ex. pawn, pawn, pawn, knight, bishop -->
     //1: knight, knight, bishop -->
@@ -475,7 +488,10 @@ function calculateNewPiece(sortedPieces) {
             won = true;
         }
     }
-    return sortedPieces[0];
+    if (pieceValueDict[sortedPieces[0]] > curMaxPiece) {
+        newPiece = true
+    }
+    return [sortedPieces[0], newPiece];
 }
 
 //function to draw direction indicator (jquery) 
@@ -499,7 +515,7 @@ function clearLine() {
 }
 
 function dragThreshold() {
-    return window.innerWidth/6;
+    return window.innerWidth/8;
 }
 
 function makeMove(curDragVec) {
@@ -526,21 +542,29 @@ function makeMove(curDragVec) {
 
     //sort any stacked pieces
     newGrid = updateGrid(newGrid);
-
     let xloc;
     let yloc;
     let gridInd;
     let locArr;
-    
     for (let loc in newGrid) {
-        let curPiece = new Piece(gameBoard);
+        let curPiece = new Piece(gameBoard);        
         locArr = loc.split(',');
         xloc = parseInt(locArr[0]);
         yloc = parseInt(locArr[1]);
         gridInd = xloc + GRID_SIZE*yloc;
         curPiece.x = xloc;
         curPiece.y = yloc;
-        curPiece.piece = newGrid[loc][0];
+
+        if (Array.isArray(newGrid[loc][0])) {
+            curPiece.piece = newGrid[loc][0][0];
+            if (newGrid[loc][0][1]) {
+                curPiece.markNewPiece();
+            }
+        }
+        else {
+            curPiece.piece = newGrid[loc][0];
+        }
+        
         grid.cells[gridInd].piece = curPiece;   
         newPieceList.push(curPiece);   
           
@@ -556,7 +580,7 @@ function makeRandomMove() {
     let angle = Math.random() * 2 * Math.PI;
     makeMove([Math.sin(angle), Math.cos(angle)]);
 }
-// setInterval(makeRandomMove, 1);
+//setInterval(makeRandomMove, 1);
 
 
 function windicator() {

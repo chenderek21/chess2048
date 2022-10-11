@@ -1,4 +1,5 @@
 export const GRID_SIZE = 4;
+//import GRID_SIZE from "./script.js";
 export const CELL_SIZE = Math.floor(60/GRID_SIZE);
 const CELL_GAP = CELL_SIZE/10;
 export class Grid {

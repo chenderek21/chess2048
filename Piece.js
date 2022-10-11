@@ -9,6 +9,8 @@ export default class Piece {
     constructor(pieceContainer, piece) {
         this.#pieceElement = document.createElement("div");
         this.#pieceElement.classList.add("piece");
+        
+
         pieceContainer.append(this.#pieceElement);
         this.piece = piece;
         this.offsetx = 0;
@@ -61,6 +63,10 @@ export default class Piece {
 
     remove() {
         this.#pieceElement.remove();
+    }
+
+    markNewPiece() {
+        this.#pieceElement.classList.add("newPiece");
     }
 
 }
