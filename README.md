@@ -5,6 +5,12 @@ Check it out here: https://chenderek21.github.io/chess2048/
 
 Updates:
 
+10/11/22: Added Grid Size Slider
+
+10/10/22: Added Piece Spawn/Merging Animations
+
+10/10/22: Fixed Bug where moves can be made when modals are open
+
 10/6/22: Added Fairy Pieces (archbishop, chancellor, amazon)
 
 09/21/22: Added Windicator Modal
