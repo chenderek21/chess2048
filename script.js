@@ -161,9 +161,9 @@ function startGame(){
     grid.delete();
     pieceList = [];
     grid = new Grid(gameBoard, gridSize);
-    for (let i = 0; i < 64; i++){
-        //spawnNewPiece(); 
-        spawnQueen();
+    for (let i = 0; i < 2; i++){
+        spawnNewPiece(); 
+        //spawnQueen();
     }
 }
 
