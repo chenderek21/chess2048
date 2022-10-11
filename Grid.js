@@ -1,19 +1,18 @@
-export const GRID_SIZE = 4;
-//import GRID_SIZE from "./script.js";
-export const CELL_SIZE = Math.floor(60/GRID_SIZE);
-const CELL_GAP = CELL_SIZE/10;
 export class Grid {
     #cells;
-
-    constructor(gridElement) {
-        gridElement.style.setProperty("--grid-size", GRID_SIZE)
-        gridElement.style.setProperty("--cell-size", `${CELL_SIZE}vmin`)
-        gridElement.style.setProperty("--cell-gap", `${CELL_GAP}vmin`)
-        this.#cells = createCellElements(gridElement).map((cellElement, index) => {
+    #gridElement;
+    constructor(gridElement, gridSize) {
+        this.#gridElement = gridElement;
+        gridElement.style.setProperty("--grid-size", gridSize);
+        let CELL_SIZE = Math.floor(60/gridSize);
+        let CELL_GAP = CELL_SIZE/10;
+        gridElement.style.setProperty("--cell-size", `${CELL_SIZE}vmin`);
+        gridElement.style.setProperty("--cell-gap", `${CELL_GAP}vmin`);
+        this.#cells = createCellElements(gridElement, gridSize).map((cellElement, index) => {
             return new Cell(
                 cellElement,
-                index % GRID_SIZE, //x
-                Math.floor(index / GRID_SIZE) //y
+                index % gridSize, //x
+                Math.floor(index / gridSize) //y
             );
         });
     }
@@ -32,9 +31,13 @@ export class Grid {
         return this.#emptyCells.length === 0;
     }
 
-    randomEmptyCell(){
+    randomEmptyCell() {
         const randomIndex = Math.floor(Math.random()*this.#emptyCells.length); 
         return this.#emptyCells[randomIndex]
+    }
+
+    delete() {
+        this.#gridElement.innerHTML = ""
     }
 }
 
@@ -71,11 +74,11 @@ class Cell {
     }
 }
 
-function createCellElements(gridElement) {
+function createCellElements(gridElement, gridSize) {
     const cells = []
-    for (let i = 0; i < GRID_SIZE*GRID_SIZE; i++) {
-        const curRow = Math.floor(i/GRID_SIZE)
-        const curCol = i%GRID_SIZE
+    for (let i = 0; i < gridSize*gridSize; i++) {
+        const curRow = Math.floor(i/gridSize)
+        const curCol = i%gridSize   
         const cell = document.createElement("div")
         //generate checkerboard pattern
         if ((curRow+curCol)%2 == 0){

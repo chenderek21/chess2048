@@ -1,8 +1,9 @@
-import {GRID_SIZE, CELL_SIZE, Grid} from "./Grid.js";
+import {Grid} from "./Grid.js";
 import Piece from "./Piece.js";
 
-const gameBoard = document.getElementById("game-board");
-const grid = new Grid(gameBoard);
+let gridSize = 4;
+let gameBoard = document.getElementById("game-board");
+let grid = new Grid(gameBoard, gridSize);
 let moveCount = 0;
 let won = false;
 let alreadyWon = false;
@@ -11,32 +12,53 @@ const modal = document.querySelector("#modal");
 const modal_settings = document.querySelector("#modal-settings");
 const modal_windicator = document.querySelector("#modal-windicator");
 
-$("#tutorial-button").click(() => modal.showModal());
-$(".close-button").click(() => modal.close());
+//event handlers
+let updateGridSizeIndicator = function() {
+    var gridSizeIndicator = document.getElementsByClassName("grid-size-indicator")
+    var sliderValue = +document.getElementById("grid-size").value;
+    Array.prototype.forEach.call(gridSizeIndicator, function (element) {
+        element.innerHTML = sliderValue;
+    }); 
+    let slider = document.getElementById("grid-size")
+    slider.style.background = `linear-gradient(to right, #8ab892 0%, #8ab892 ${(slider.value-slider.min)/(slider.max-slider.min)*100}%, #DEE2E6 ${(slider.value-slider.min)/(slider.max-slider.min)*100}%, #DEE2E6 100%)`
+};
+
+$("#tutorial-button").click(() => {
+    modal.showModal();
+    modalOpen = true;
+});
+$(".close-tutorial").click(() => {
+    modal.close();
+    modalOpen = false;
+});
 $("#settings-button").click(() => {
     modalOpen = true;
     modal_settings.showModal();
 });
-$(".close-button").click(() => {
+$("#close-settings").click(() => {
+    document.getElementById("grid-size").value = gridSize;
+    updateGridSizeIndicator();
     modalOpen = false;
     modal_settings.close();
 });
-$(".close-windicator").click(() => {
+$("#close-windicator").click(() => {
     won = false; 
     modal_windicator.close();
 });
-$(".restart").click(() => location.reload());
-var pieceList = [];
-document.getElementById('move-count').innerHTML = moveCount;
+$("#apply-settings").click(() => {
+    var sliderValue = +document.getElementById("grid-size").value;
+    gridSize = sliderValue;
+    
+    startGame();
+    modalOpen = false;
+    modal_settings.close();
+});
+$("#restart-button").click(() => location.reload());
 
-
+var pieceList;
 
 //initialization of game board (2 starting pieces)
-for (let i = 0; i < 2; i++){
-    spawnNewPiece(); 
-    //spawnQueen();
-}
-
+startGame();
 
 //start of game 
 handleInput();
@@ -55,7 +77,7 @@ function handleInput() {
     //when mouse pressed, record starting position
 
     function mouseDownHandler(e) { 
-        if (won) {
+        if (won || modalOpen) {
             return
         }
         e.preventDefault();
@@ -123,8 +145,27 @@ function handleInput() {
             curPiece.offsety = nudgeDistance(yVec*curMagnitude);
         }
     };
+
+    //handle slider input
+    var slider = document.getElementById("grid-size");
+    updateGridSizeIndicator();
+
+    slider.oninput = updateGridSizeIndicator;
 }
 
+function startGame(){
+    won = false;
+    alreadyWon = false;
+    moveCount = 0;
+    document.getElementById('move-count').innerHTML = moveCount;
+    grid.delete();
+    pieceList = [];
+    grid = new Grid(gameBoard, gridSize);
+    for (let i = 0; i < 64; i++){
+        //spawnNewPiece(); 
+        spawnQueen();
+    }
+}
 
 function movePiece(startPos, dragVec, curPiece) {
     let pieceType = curPiece.piece;
@@ -396,7 +437,7 @@ function moveAmazon(dx, dy, startPos) {
 function inBounds(endLoc) {
     let endx = endLoc[0];
     let endy = endLoc[1];
-    return endx >= 0 && endx < GRID_SIZE && endy >= 0 && endy < GRID_SIZE;
+    return endx >= 0 && endx < gridSize && endy >= 0 && endy < gridSize;
 }
 
 function nudgeDistance(dragDistance) {
@@ -535,7 +576,7 @@ function makeMove(curDragVec) {
         //update new grid with moved pieces
         newGrid[newLoc].push(curPiece.piece);
         //clear original pieces
-        let gridInd = startPosition[0] + GRID_SIZE*startPosition[1];
+        let gridInd = startPosition[0] + gridSize*startPosition[1];
         grid.cells[gridInd].piece.remove();
         grid.cells[gridInd].piece = undefined;
     }
@@ -551,7 +592,7 @@ function makeMove(curDragVec) {
         locArr = loc.split(',');
         xloc = parseInt(locArr[0]);
         yloc = parseInt(locArr[1]);
-        gridInd = xloc + GRID_SIZE*yloc;
+        gridInd = xloc + gridSize*yloc;
         curPiece.x = xloc;
         curPiece.y = yloc;
 

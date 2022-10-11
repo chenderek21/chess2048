@@ -39,7 +39,7 @@
       <dialog class="modal" id="modal">
         <div class ="modal-header">
           <h2>How to Play</h2>
-          <button class="close-button">&nbsp;&times;&nbsp;</button>    
+          <button class="close-button-x close-tutorial">&nbsp;&times;&nbsp;</button>    
         </div>
         <p>In this game, pieces move as they do in Chess, and merge similarly as they do 2048! Your goal is to save the king in the least number of moves.</p>
         <p><b>Click and drag</b> to move and combine the pieces!</p>
@@ -89,19 +89,22 @@
         <p>
           Good Luck! 
         </p>
-        <button class="close-button" id="close-modal">Close</button>      
+        <button class="close-button-bottom close-tutorial">Close</button>      
       </dialog>
 
       <dialog class="modal" id="modal-settings">
         <div class ="modal-header">
           <h2>Settings</h2>
-          <button class="close-button">&nbsp;&times;&nbsp;</button>    
+          <button class="close-button-x" id="close-settings">&nbsp;&times;&nbsp;</button>    
         </div>
         <div id = "settings">
           <p>
-            Grid Size: 
+            Grid Size: <span class="grid-size-indicator"></span> x <span class="grid-size-indicator"></span>
+            
             <div class="slidecontainer">
-              <input type="range" min="1" max="100" value="50" class="slider" id="gridSize">
+              
+              <input type="range" min="3" max="8" value="4" class="slider" id="grid-size">
+              
             </div>
           </p>
           <p>
@@ -109,7 +112,7 @@
           </p>
         </div>
         
-        <button class="close-button" id="close-modal">Close</button>      
+        <button class="close-button-bottom" id="apply-settings">Apply & Restart</button>      
       </dialog>
 
 
@@ -124,8 +127,8 @@
             </div>
             <br>  
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary close-windicator" data-dismiss="modal">Continue</button>
-                <button type="button" class="btn restart close-button" data-dismiss="modal">Restart</button>
+                <button type="button" id="close-windicator" data-dismiss="modal">Continue</button>
+                <button type="button" id="restart-button" data-dismiss="modal">Restart</button>
             </div>
         </div>
       </dialog>

@@ -69,7 +69,7 @@ body {
     margin-left: 0.5vmin;
 }
 
-.close-button {
+.close-button-x {
     font-size: 3vmin;
 }
 
@@ -77,9 +77,11 @@ body {
     font-size: 3vmin;
 }
 
-#close-modal {
+.close-button-bottom {
     font-size: 1.75vmin;
 }
+
+
 
 #buttons {
     float: right;
@@ -215,3 +217,36 @@ p {
     font-size: 3.25vmin;
 }
 
+.slider {
+    width: 50%; 
+    height: 5px;
+    -webkit-appearance: none;
+    outline: none; 
+    opacity: 0.7; 
+    -webkit-transition: .2s; 
+    transition: opacity .2s;
+    border: 0.5px gray;
+    border-radius: 2.5px;   
+}
+  
+.slider:hover {
+    opacity: 1; 
+}
+
+.slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 15px;
+    height: 15px;
+    border-radius: 7.5px;
+    background: #006400;  
+    cursor: pointer;
+}
+
+.slider::-moz-range-thumb {
+    width: 15px;
+    height: 15px;
+    border-radius: 7.5px;
+    background: #006400;  
+    cursor: pointer;
+}
